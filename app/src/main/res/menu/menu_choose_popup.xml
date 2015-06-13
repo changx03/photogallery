@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/grid_view"
+        android:title="Grid View"/>
+
+    <item
+        android:id="@+id/list_view"
+        android:title="List View"/>
+
+    <item
+    android:id="@+id/multiple_select"
+    android:title="Multiple Select"/>
+
+</menu>
