@@ -3,11 +3,11 @@
 
     <item
         android:id="@+id/take_photo"
-        android:title="Take a Photo"/>
+        android:title="@string/take_photo"/>
 
     <item
         android:id="@+id/choose_from_library"
-        android:title="Choose from Library"/>
+        android:title="@string/choose_from_library"/>
 
 
 

@@ -31,6 +31,13 @@
             android:name=".ui.ImageDetailActivity"
             android:label="@string/title_activity_solo_image" >
         </activity>
+<<<<<<< HEAD
+=======
+        <activity
+            android:name=".ui.ImageEditActivity"
+            android:label="@string/title_edit_image" >
+        </activity>
+>>>>>>> origin/master
     </application>
 
 </manifest>
