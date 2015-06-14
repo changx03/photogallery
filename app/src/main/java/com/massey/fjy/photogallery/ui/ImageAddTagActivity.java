@@ -36,7 +36,7 @@ public class ImageAddTagActivity extends Activity {
 
         System.out.println("LOG: bitmap size = " + BitmapHelper.getByteSizeOf(resourceImage));
 
-        ImageView imageView = (ImageView)findViewById(R.id.bigImage);
+        ImageView imageView = (ImageView) findViewById(R.id.bigImage);
         imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         imageView.setImageBitmap(resourceImage);
 

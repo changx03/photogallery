@@ -7,9 +7,11 @@
     <dimen name="image_thumbnail_spacing">2dp</dimen>
     <dimen name="image_detail_activity_window_height">300dp</dimen>
 
-    <dimen name="text_size_20">20sp</dimen>
+    <dimen name="text_size_18">18sp</dimen>
     <dimen name="menu_margin">48dp</dimen>
     <dimen name="image_detail_content_padding">20dp</dimen>
     <dimen name="menu_margin_land">40dp</dimen>
     <dimen name="image_detail_content_padding_land">10dp</dimen>
+    <dimen name="dialog_edit_editText_padding">6dp</dimen>
+    <dimen name="text_size_16">16sp</dimen>
 </resources>

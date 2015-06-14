@@ -27,4 +27,8 @@
     <string name="no_content">No content</string>
     <string name="toast_ImageDetailActivity_delete">Deleting image...</string>
     <string name="title_activity_image_add_tag">Add Tags</string>
+    <string name="dialog_edit_editText_hint">Input new notes for this image</string>
+    <string name="toast_ImageDetailActivity_noteUpdate">Updating notes...</string>
+    <string name="action_clear">Clear</string>
+
 </resources>

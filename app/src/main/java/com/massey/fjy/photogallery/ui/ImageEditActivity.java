@@ -22,7 +22,6 @@ import com.massey.fjy.photogallery.utils.FilterHelper;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.util.ArrayList;
 
 /**
@@ -217,14 +216,12 @@ public class ImageEditActivity extends Activity {
                     public void run() {
                         int jumpTime = 0;
 
-
                         while(jumpTime < totalProgressTime) {
                             try {
                                 sleep(200);
                                 jumpTime += 5;
                                 progress.setProgress(jumpTime);
-                            }
-                            catch (InterruptedException e) {
+                            } catch (InterruptedException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
