@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 
 import java.io.File;
 
@@ -13,6 +14,8 @@ import java.io.File;
 public class BitmapHelper {
     public static final int IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT = 300;  //R.dimen.image_detail_activity_window_height
     public static final int IMAGE_THUMBNAIL_SIZE = 100;//R.dimen.image_thumbnail_size
+    public static final int IMAGE_EDIT_ACTIVITY_WINDOW_HEIGHT = 100;  //R.dimen.image_edit_activity_window_height
+    public static final int IMAGE_SAVE_SIZE = 400;
 
     public static Bitmap decodeBitmapFromUri(String path, int reqWidth, int reqHeight){
         Bitmap bitmap;
@@ -31,7 +34,7 @@ public class BitmapHelper {
         return bitmap;
     }
 
-    public static Bitmap decodeBitmapFromResource(Resources resources,int id, int reqWidth, int reqHeight){
+    public static Bitmap decodeBitmapFromResource(Resources resources, int id, int reqWidth, int reqHeight){
         Bitmap bitmap;
         // check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -78,4 +81,30 @@ public class BitmapHelper {
 //        System.out.println("pixels = " + pixels);
         return pixels;
     }
+
+    public static int getByteSizeOf(Bitmap bitmap) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return bitmap.getAllocationByteCount();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            return bitmap.getByteCount();
+        } else {
+            return bitmap.getRowBytes() * bitmap.getHeight();
+        }
+    }
+
+    public static Bitmap getResizedBitmap(Bitmap image, int maxSize) { // resize bitmap
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float)width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
 }

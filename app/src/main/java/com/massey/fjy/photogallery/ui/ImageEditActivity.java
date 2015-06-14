@@ -1,12 +1,16 @@
 package com.massey.fjy.photogallery.ui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,6 +30,8 @@ import com.massey.fjy.photogallery.utils.BitmapHelper;
 import com.massey.fjy.photogallery.utils.DataHelper;
 import com.massey.fjy.photogallery.utils.FilterHelper;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -37,6 +43,9 @@ public class ImageEditActivity extends Activity {
     private Bitmap resourceImage;
     private boolean clickFilter[];
     private int filterNum;
+    private String imagePath;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,16 +56,16 @@ public class ImageEditActivity extends Activity {
 
         // get current image path from sharePreferences
         SharedPreferences prefs = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
-        String imagePath = prefs.getString(DataHelper.CURRENT_IMAGE_PATH, null);
+        imagePath = prefs.getString(DataHelper.CURRENT_IMAGE_PATH, null);
 
         System.out.println("LOG: I want to edit this image: " + imagePath);
 
         // scale down the image
-        int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(), BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
-        Bitmap mySelectedBitmap = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
-        resourceImage = getResizedBitmap(mySelectedBitmap, 640);
+        int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(), BitmapHelper.IMAGE_EDIT_ACTIVITY_WINDOW_HEIGHT);
+        resourceImage = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
+        System.out.println("LOG: resize size = " + reqSize);
 
-        System.out.println("LOG: bitmap size = " + byteSizeOf(mySelectedBitmap));
+        System.out.println("LOG: bitmap size = " + BitmapHelper.getByteSizeOf(resourceImage));
 
         ImageView imageView = (ImageView)findViewById(R.id.bigImage);
         imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -115,7 +124,7 @@ public class ImageEditActivity extends Activity {
         FilterHelper filterhelper;
         filterhelper = new FilterHelper();
 
-        Bitmap src = getResizedBitmap(resource, 160);
+        Bitmap src = BitmapHelper.getResizedBitmap(resource, 160);
 
         ArrayList<Bitmap> filterBitmaps = new ArrayList<>();
 
@@ -125,30 +134,6 @@ public class ImageEditActivity extends Activity {
         return filterBitmaps;
     }
 
-    public static int byteSizeOf(Bitmap bitmap) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return bitmap.getAllocationByteCount();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            return bitmap.getByteCount();
-        } else {
-            return bitmap.getRowBytes() * bitmap.getHeight();
-        }
-    }
-
-    public Bitmap getResizedBitmap(Bitmap image, int maxSize) { // resize bitmap
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float)width / (float) height;
-        if (bitmapRatio > 1) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-        }
-        return Bitmap.createScaledBitmap(image, width, height, true);
-    }
 
 
     private View generateView(Bitmap bitmap, final int index) {
@@ -194,12 +179,78 @@ public class ImageEditActivity extends Activity {
         return true;
     }
 
+    private void SaveFilteredImageToFile() {
+
+        for (int i = 0; i < filterNum; i++) {
+            if (clickFilter[i]) {
+                // get a bigger size image
+                int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(), BitmapHelper.IMAGE_SAVE_SIZE);
+                Bitmap srcImage = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
+                System.out.println("LOG: filePath = " + imagePath);
+                Bitmap outImage = useFilter(srcImage, i);
+                System.out.println("LOG: save a new image size = " + BitmapHelper.getByteSizeOf(outImage));
+
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(imagePath);
+                    outImage.compress(Bitmap.CompressFormat.JPEG, 85, out);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+        }
+
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
+                final ProgressDialog progress = new ProgressDialog(this);
+                progress.setMessage("Saving...");
+                progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progress.setIndeterminate(true);
+                progress.setProgress(0);
+                progress.show();
 
+                final int totalProgressTime = 100;
+                final Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        int jumpTime = 0;
+
+                        while(jumpTime < totalProgressTime) {
+                            try {
+                                sleep(200);
+                                jumpTime += 5;
+                                progress.setProgress(jumpTime);
+                            }
+                            catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                };
+                t.start();
+            /*    System.out.println("LOG: show toast");
+                Toast toast = Toast.makeText(getApplicationContext(), "Saving image...", Toast.LENGTH_LONG);
+                toast.show();
+                System.out.println("LOG: end show toast");*/
+
+                //update real image in directory
+                SaveFilteredImageToFile();
+
+                //end this activity
+                finish();
                 return true;
 
         }
