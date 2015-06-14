@@ -1,21 +1,30 @@
 package com.massey.fjy.photogallery.ui;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.SearchView;
 
@@ -60,6 +69,14 @@ public class MainActivity extends Activity {
             "thumbnail_9.jpg"
     };
 
+    // navigation drawer
+    private String[] mImageTags;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private CharSequence mTitle;
+    private CharSequence mDrawerTitle;
+    private ActionBarDrawerToggle mDrawerToggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,9 +85,9 @@ public class MainActivity extends Activity {
         DbHelper dbHelper = new DbHelper(this);
         String photoGalleryPath = getFilesDir() + "/" + DataHelper.IMAGE_DIR;
         File photoGalleryDir = new File(photoGalleryPath);
-        if(!photoGalleryDir.exists()) {
+        if (!photoGalleryDir.exists()) {
             photoGalleryDir.mkdir();
-            for(int i = 0; i < mImgIds.length; i++){
+            for (int i = 0; i < mImgIds.length; i++) {
                 // loading smaller image into private gallery folder. Nexus 5 emulator seems doesn't have enough memory for full size
                 Bitmap mImg = BitmapHelper.decodeBitmapFromResource(getResources(), mImgIds[i], 640, 480);
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -79,7 +96,7 @@ public class MainActivity extends Activity {
                 mImg.recycle();
 
                 FileOutputStream fos;
-                try{
+                try {
                     destination.createNewFile();
                     fos = new FileOutputStream(destination);
                     fos.write(bytes.toByteArray());
@@ -92,7 +109,7 @@ public class MainActivity extends Activity {
                     //save(String tag, String location, Float latitude, Float longitude,
                     //      String note, String imageName, String date, String tagPeople)
                     dbHelper.save("Initial", "Cat city", null, null, ("Note: " + thumbnailImages[i]), thumbnailImages[i], date, null);
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -108,6 +125,78 @@ public class MainActivity extends Activity {
         showViewFragment(mViewMode); // read view mode from settings in sharedpreferences
 
         handleIntent(getIntent()); //for search
+
+        // navigation drawer
+        mTitle = mDrawerTitle = getTitle();
+        mImageTags = getResources().getStringArray(R.array.tags);
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        System.out.println("LOG MainActivity mDrawerLayout = " + mDrawerLayout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        System.out.println("LOG MainActivity mDrawerList = " + mDrawerList);
+        mDrawerList.setAdapter(new ArrayAdapter<>(this,
+                R.layout.drawer_list_item, mImageTags));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                R.drawable.ic_drawer,
+                R.string.drawer_open,
+                R.string.drawer_close) {
+            // Called when a drawer has settled in a completely closed state
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getActionBar().setTitle(mTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            // Called when a drawer has settled in a completely open state
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        getActionBar().setIcon(android.R.color.transparent);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
+
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        menu.findItem(R.id.action_add).setVisible(!drawerOpen);
+        menu.findItem(R.id.action_choose).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     private void showViewFragment(int mode) {
@@ -123,6 +212,32 @@ public class MainActivity extends Activity {
             ft.commit();
         }
     }
+    /** Swaps fragments in the main content view */
+    private void selectItem(int position) {
+        // Create a new fragment and specify the planet to show based on position
+//        Fragment fragment = new PlanetFragment();
+//        Bundle args = new Bundle();
+//        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+//        fragment.setArguments(args);
+
+        // Insert the fragment by replacing any existing fragment
+//        FragmentManager fragmentManager = getFragmentManager();
+//        fragmentManager.beginTransaction()
+//                .replace(R.id.content_frame, fragment)
+//                .commit();
+
+        // Highlight the selected item, update the title, and close the drawer
+        mDrawerList.setItemChecked(position, true);
+        setTitle(mImageTags[position]);
+        mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
+    }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -152,6 +267,10 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         switch (item.getItemId()) {
             case R.id.action_add:
                 showAddPopup(findViewById(item.getItemId()));

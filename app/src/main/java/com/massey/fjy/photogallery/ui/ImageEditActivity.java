@@ -44,7 +44,6 @@ public class ImageEditActivity extends Activity {
 
         LinearLayout ll = (LinearLayout)findViewById(R.id.filter_preview_list);
 
-
         // get current image path from sharePreferences
         SharedPreferences prefs = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         imagePath = prefs.getString(DataHelper.CURRENT_IMAGE_PATH, null);
@@ -62,13 +61,14 @@ public class ImageEditActivity extends Activity {
         imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         imageView.setImageBitmap(resourceImage);
 
-
         ArrayList<Bitmap> filterBitmaps = generateFilters(resourceImage);
         filterNum = filterBitmaps.size();
         clickFilter = new boolean[filterNum];
         for (int i = 0; i < filterBitmaps.size(); i++) {
             ll.addView(generateView(filterBitmaps.get(i), i));
         }
+
+        getActionBar().setIcon(android.R.color.transparent);
     }
 
    String filterNames[] = {"Brighter", "Red", "Green", "Blue", "Depth", "Constract", "Hue", "Invert" };

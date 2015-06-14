@@ -2,7 +2,8 @@
 <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?android:attr/actionBarSize">
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -11,7 +12,6 @@
             android:id="@+id/imageDetail_image"
             android:layout_width="fill_parent"
             android:layout_height="@dimen/image_detail_activity_window_height"
-            android:layout_marginTop="@dimen/menu_margin"
             android:scaleType="fitCenter"
             android:contentDescription="@string/image_description" />
 

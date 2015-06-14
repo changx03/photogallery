@@ -96,6 +96,8 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         editNoteDialog = new EditNoteDialog(this);
         editNoteDialog.setOnDismissListener(this);
         editNoteDialog.setTitle("Edit Note");
+
+        getActionBar().setIcon(android.R.color.transparent);
     }
 
     @Override
