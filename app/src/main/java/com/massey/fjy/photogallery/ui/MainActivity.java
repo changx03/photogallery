@@ -130,8 +130,8 @@ public class MainActivity extends Activity {
     private void handleIntent(Intent intent) {
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            System.out.println("query word" + query);
+            String myQueryStr = intent.getStringExtra(SearchManager.QUERY);
+            System.out.println("query word = " + myQueryStr);
             //use the query to search data somehow
         }
     }
