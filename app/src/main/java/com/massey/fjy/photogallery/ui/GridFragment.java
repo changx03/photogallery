@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.massey.fjy.photogallery.db.DbHelper;
 import com.massey.fjy.photogallery.R;
@@ -51,7 +50,7 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View view = inflater.inflate(R.layout.grid, container, false);
+        final View view = inflater.inflate(R.layout.fragment_grid, container, false);
 
         System.out.println("onCreateView");
 

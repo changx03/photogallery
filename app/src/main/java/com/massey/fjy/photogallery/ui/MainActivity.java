@@ -89,7 +89,9 @@ public class MainActivity extends Activity {
                     String date = DataHelper.getDateTimeToString();
 
                     // add to database
-                    dbHelper.save(null, null, null, null, null, thumbnailImages[i], date, null);
+                    //save(String tag, String location, Float latitude, Float longitude,
+                    //      String note, String imageName, String date, String tagPeople)
+                    dbHelper.save("Initial", "Cat city", null, null, ("Note: " + thumbnailImages[i]), thumbnailImages[i], date, null);
                 }catch (IOException e){
                     e.printStackTrace();
                 }
@@ -102,7 +104,7 @@ public class MainActivity extends Activity {
 
         // get view mode
         SharedPreferences settings = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
-        mViewMode = settings.getInt(DataHelper.VIEW_MODE, VIEW_MODE_GRID);   // use grid view as default
+        mViewMode = settings.getInt(DataHelper.VIEW_MODE, VIEW_MODE_GRID);   // use fragment_grid view as default
         showViewFragment(mViewMode); // read view mode from settings in sharedpreferences
 
         handleIntent(getIntent()); //for search
@@ -130,8 +132,8 @@ public class MainActivity extends Activity {
     private void handleIntent(Intent intent) {
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            System.out.println("query word" + query);
+            String myQueryStr = intent.getStringExtra(SearchManager.QUERY);
+            System.out.println("query word = " + myQueryStr);
             //use the query to search data somehow
         }
     }

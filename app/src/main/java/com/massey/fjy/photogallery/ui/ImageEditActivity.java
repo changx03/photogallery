@@ -5,25 +5,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.massey.fjy.photogallery.R;
 import com.massey.fjy.photogallery.utils.BitmapHelper;
@@ -32,7 +22,7 @@ import com.massey.fjy.photogallery.utils.FilterHelper;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
+
 import java.util.ArrayList;
 
 /**
@@ -49,7 +39,7 @@ public class ImageEditActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activiy_filter);
+        setContentView(R.layout.activity_image_edit);
 
         LinearLayout ll = (LinearLayout)findViewById(R.id.filter_preview_list);
 
@@ -175,7 +165,7 @@ public class ImageEditActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_filter, menu);
+        getMenuInflater().inflate(R.menu.menu_image_edit, menu);
         return true;
     }
 

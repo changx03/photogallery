@@ -22,4 +22,7 @@
     <string name="title_activity_main_activity2">MainActivity2Activity</string>
     <string name="title_activity_solo_image">Photo</string>
     <string name="title_edit_image">Edit</string>
+    <string name="image_description">selected image thumbnail</string>
+    <string name="no_content">No content</string>
+    <string name="toast_ImageDetailActivity_delete">Deleting image...</string>
 </resources>

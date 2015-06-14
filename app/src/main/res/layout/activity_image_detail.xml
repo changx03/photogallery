@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/imageDetail_image"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/image_detail_activity_window_height"
+            android:layout_marginTop="@dimen/menu_margin"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/image_description" />
+
+        <TextView
+            android:id="@+id/imageDetail_tag"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/image_detail_content_padding"
+            android:hint="@string/no_content"
+            android:textSize="@dimen/text_size_20"
+            android:drawableStart="@drawable/ic_action_tag" />
+
+        <TextView
+            android:id="@+id/imageDetail_location"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/image_detail_content_padding"
+            android:hint="@string/no_content"
+            android:textSize="@dimen/text_size_20"
+            android:drawableStart="@drawable/ic_action_place" />
+
+        <TextView
+            android:id="@+id/imageDetail_date"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/image_detail_content_padding"
+            android:hint="@string/no_content"
+            android:textSize="@dimen/text_size_20"
+            android:drawableStart="@drawable/ic_action_time" />
+
+        <TextView
+            android:id="@+id/imageDetail_note"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/image_detail_content_padding"
+            android:hint="@string/no_content"
+            android:textSize="@dimen/text_size_20"
+            android:drawableStart="@drawable/ic_action_note" />
+    </LinearLayout>
+</ScrollView>
+
