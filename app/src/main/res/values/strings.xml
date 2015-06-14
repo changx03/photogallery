@@ -24,4 +24,5 @@
     <string name="title_edit_image">Edit</string>
     <string name="image_description">selected image thumbnail</string>
     <string name="no_content">No content</string>
+    <string name="toast_ImageDetailActivity_delete">Deleting image...</string>
 </resources>

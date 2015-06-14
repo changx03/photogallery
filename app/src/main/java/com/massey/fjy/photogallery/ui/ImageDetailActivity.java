@@ -1,8 +1,11 @@
 package com.massey.fjy.photogallery.ui;
 
 //import android.app.Activity;
+
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -24,6 +27,7 @@ import com.massey.fjy.photogallery.db.DbHelper;
 import com.massey.fjy.photogallery.utils.BitmapHelper;
 import com.massey.fjy.photogallery.utils.DataHelper;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -32,6 +36,7 @@ public class ImageDetailActivity extends FragmentActivity {
 
     private Bitmap mySelectedBitmap;
     private String imagePath;
+    private String myImageName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,7 @@ public class ImageDetailActivity extends FragmentActivity {
         // get image name from database
         DbHelper dbHelper = new DbHelper(this);
         ArrayList<String> imagesNames = dbHelper.getAllGridView();
-        String myImageName = imagesNames.get(currentIndex);
+        myImageName = imagesNames.get(currentIndex);
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         String photoGalleryPath = sharedPref.getString(DataHelper.PHOTO_GALLERY_FULL_PATH, null);
         imagePath = photoGalleryPath + "/" + myImageName;
@@ -103,10 +108,41 @@ public class ImageDetailActivity extends FragmentActivity {
                 showEditPopup(findViewById(item.getItemId()));
                 return true;
             case R.id.action_delete:
+                deleteImage();
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void deleteImage() {
+        // build alert dialog
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setTitle("Delete image");
+        alertBuilder.setMessage("Are you sure you want to delete this image?");
+        alertBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DbHelper dbHelper = new DbHelper(getApplicationContext());
+                Toast.makeText(getApplicationContext(), R.string.toast_ImageDetailActivity_delete, Toast.LENGTH_SHORT).show();
+                // delete from db
+                dbHelper.deleteSingleImage(myImageName);
+                // delete from storage
+                File file = new File(imagePath);
+                if (file.exists()) {
+                    file.delete();
+                }
+                // return to perilous activity
+                finish();
+            }
+        });
+        alertBuilder.show();
     }
 
     private void showEditPopup(View v) {

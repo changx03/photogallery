@@ -93,4 +93,11 @@ public class DbHelper extends SQLiteOpenHelper{
         System.out.println("DbHelper_key = " + imageData.key);
         return imageData;
     }
+
+    public Integer deleteSingleImage(String imageName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        return db.delete(DbTableContract.PhotoGalleryTable.DB_TABLE_NAME,
+                DbTableContract.PhotoGalleryTable.FIELD_IMAGE_NAME + " = ?", new String[]{imageName});
+    }
 }
