@@ -6,13 +6,13 @@
     android:orientation="horizontal" >
 
     <RelativeLayout
-        android:id="@+id/tag_left_layout"
+        android:id="@+id/tag_right_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/tagview_left" >
+        android:background="@drawable/tagview_right" >
 
         <TextView
-            android:id="@+id/tag_left_textview"
+            android:id="@+id/tag_right_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -24,7 +24,7 @@
             android:textSize="12sp" />
 
         <EditText
-            android:id="@+id/tag_left_edittext"
+            android:id="@+id/teg_right_edittext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
