@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
@@ -33,7 +34,7 @@ public class ImageEditActivity extends Activity {
     private boolean clickFilter[];
     private int filterNum;
     private String imagePath;
-
+    ProgressDialog progressDiag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +70,14 @@ public class ImageEditActivity extends Activity {
         }
     }
 
-   String filterNames[] = {"Brighter", "Red", "Green", "Blue", "Depth", "Constract", "Hue", "Invert" };
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (progressDiag != null)
+            progressDiag.dismiss();
+    }
+
+    String filterNames[] = {"Brighter", "Red", "Green", "Blue", "Depth", "Constract", "Hue", "Invert" };
 
     private Bitmap useFilter(Bitmap src, int filterIndex) {
         FilterHelper filterhelper;
@@ -199,46 +207,55 @@ public class ImageEditActivity extends Activity {
 
     }
 
+    private void ShowProgressDialog() {
+        progressDiag = new ProgressDialog(this);
+        progressDiag.setMessage("Saving...");
+        progressDiag.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDiag.setIndeterminate(true);
+        progressDiag.setProgress(0);
+        progressDiag.show();
+
+        final int totalProgressTime = 100;
+        final Thread t = new Thread() {
+            @Override
+            public void run() {
+                int jumpTime = 0;
+
+                while(jumpTime < totalProgressTime) {
+                    try {
+                        sleep(200);
+                        jumpTime += 5;
+                        progressDiag.setProgress(jumpTime);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        t.start();
+
+    }
+
+    private class SaveImageToFileTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            SaveFilteredImageToFile();
+            finish();
+            return null;
+        }
+        @Override
+        protected void onPreExecute() {
+            ShowProgressDialog();
+        }
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                final ProgressDialog progress = new ProgressDialog(this);
-                progress.setMessage("Saving...");
-                progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                progress.setIndeterminate(true);
-                progress.setProgress(0);
-                progress.show();
-
-                final int totalProgressTime = 100;
-                final Thread t = new Thread() {
-                    @Override
-                    public void run() {
-                        int jumpTime = 0;
-
-                        while(jumpTime < totalProgressTime) {
-                            try {
-                                sleep(200);
-                                jumpTime += 5;
-                                progress.setProgress(jumpTime);
-                            } catch (InterruptedException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                };
-                t.start();
-            /*    System.out.println("LOG: show toast");
-                Toast toast = Toast.makeText(getApplicationContext(), "Saving image...", Toast.LENGTH_LONG);
-                toast.show();
-                System.out.println("LOG: end show toast");*/
-
-                //update real image in directory
-                SaveFilteredImageToFile();
-
-                //end this activity
-                finish();
+                new SaveImageToFileTask().execute();
                 return true;
 
         }
