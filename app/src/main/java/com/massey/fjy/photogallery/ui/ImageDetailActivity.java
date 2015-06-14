@@ -166,6 +166,8 @@ public class ImageDetailActivity extends FragmentActivity {
                         showEditNote();
                         break;
                     case R.id.tag_people:
+                        intent = new Intent(ImageDetailActivity.this, ImageAddTagActivity.class);
+                        startActivity(intent);
                         break;
                 }
                 return true;

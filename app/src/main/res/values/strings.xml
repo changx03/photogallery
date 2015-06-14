@@ -16,6 +16,7 @@
     <string name="photo_filter">Photo Filter</string>
     <string name="add_note">Add Note</string>
     <string name="tag_people">Tag People</string>
+    <string name="edit_tagview">Edit Tag</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -25,4 +26,5 @@
     <string name="image_description">selected image thumbnail</string>
     <string name="no_content">No content</string>
     <string name="toast_ImageDetailActivity_delete">Deleting image...</string>
+    <string name="title_activity_image_add_tag">Add Tags</string>
 </resources>
