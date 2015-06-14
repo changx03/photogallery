@@ -10,4 +10,6 @@
     <dimen name="text_size_20">20sp</dimen>
     <dimen name="menu_margin">48dp</dimen>
     <dimen name="image_detail_content_padding">20dp</dimen>
+    <dimen name="menu_margin_land">40dp</dimen>
+    <dimen name="image_detail_content_padding_land">10dp</dimen>
 </resources>
