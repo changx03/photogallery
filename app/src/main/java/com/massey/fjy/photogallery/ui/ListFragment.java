@@ -50,7 +50,7 @@ public class ListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.list, container, false);
+        View root = inflater.inflate(R.layout.fragment_list, container, false);
         ListView lv = (ListView)root.findViewById(R.id.myList);
         mAdapter = new ListAdapter(getActivity(), imageList);
         lv.setAdapter(mAdapter);

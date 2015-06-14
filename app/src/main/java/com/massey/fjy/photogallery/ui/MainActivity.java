@@ -102,7 +102,7 @@ public class MainActivity extends Activity {
 
         // get view mode
         SharedPreferences settings = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
-        mViewMode = settings.getInt(DataHelper.VIEW_MODE, VIEW_MODE_GRID);   // use grid view as default
+        mViewMode = settings.getInt(DataHelper.VIEW_MODE, VIEW_MODE_GRID);   // use fragment_grid view as default
         showViewFragment(mViewMode); // read view mode from settings in sharedpreferences
 
         handleIntent(getIntent()); //for search
