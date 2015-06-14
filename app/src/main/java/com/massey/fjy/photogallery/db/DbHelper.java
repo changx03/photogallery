@@ -28,6 +28,7 @@ public class DbHelper extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(DbTableContract.DB_TABLE_DELETE);
         onCreate(db);
+        db.close();
     }
 
     public Long save(String tag, String location, Float latitude, Float longitude,
@@ -51,7 +52,7 @@ public class DbHelper extends SQLiteOpenHelper{
         // insert db
         SQLiteDatabase db = this.getWritableDatabase();
         rowId = db.insert(PhotoGalleryTable.DB_TABLE_NAME, null, values);
-
+        db.close();
         return rowId;
     }
 
@@ -98,7 +99,29 @@ public class DbHelper extends SQLiteOpenHelper{
     public Integer deleteSingleImage(String imageName) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        return db.delete(PhotoGalleryTable.DB_TABLE_NAME,
+        Integer result = db.delete(PhotoGalleryTable.DB_TABLE_NAME,
                 PhotoGalleryTable.FIELD_IMAGE_NAME + " = ?", new String[]{imageName});
+        db.close();
+        return result;
+    }
+
+    public boolean update(DataHelper.ImageData imageData) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        // content can be nullable
+        values.put(PhotoGalleryTable.FIELD_TAG, imageData.tag);
+        values.put(PhotoGalleryTable.FIELD_LOCATION, imageData.location);
+        values.put(PhotoGalleryTable.FIELD_LATITUDE, imageData.latitude);
+        values.put(PhotoGalleryTable.FIELD_LONGITUDE, imageData.longitude);
+        values.put(PhotoGalleryTable.FIELD_NOTE, imageData.note);
+        values.put(PhotoGalleryTable.FIELD_IMAGE_NAME, imageData.imageName);
+        values.put(PhotoGalleryTable.FIELD_DATE, imageData.date);
+        values.put(PhotoGalleryTable.FIELD_TAG_PEOPLE, imageData.tagPeople);
+
+        db.update(PhotoGalleryTable.DB_TABLE_NAME, values,
+                PhotoGalleryTable.FIELD_IMAGE_NAME + " = ?", new String[]{imageData.imageName});
+        db.close();
+        return true;
     }
 }

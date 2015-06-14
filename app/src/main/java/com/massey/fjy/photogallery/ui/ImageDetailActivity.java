@@ -47,7 +47,7 @@ public class ImageDetailActivity extends FragmentActivity {
         int currentIndex = 0;
         if(extras != null){
             currentIndex = extras.getInt(EXTRA_IMAGE);
-            System.out.println("currentIndex = " + currentIndex);
+            System.out.println("LOG ImageDetailActivity: currentIndex = " + currentIndex);
         }
 
         Toast toast = Toast.makeText(getApplicationContext(), "Loading image...", Toast.LENGTH_SHORT);
@@ -61,15 +61,17 @@ public class ImageDetailActivity extends FragmentActivity {
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         String photoGalleryPath = sharedPref.getString(DataHelper.PHOTO_GALLERY_FULL_PATH, null);
         imagePath = photoGalleryPath + "/" + myImageName;
-        System.out.println("imagePath = " + imagePath);
+        System.out.println("LOG ImageDetailActivity: imagePath = " + imagePath);
 
         // update sharedPref
-        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME,
+                Context.MODE_PRIVATE).edit();
         editor.putString(DataHelper.CURRENT_IMAGE_PATH, imagePath);
         editor.apply();
 
         // scale down the image
-        int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(), BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
+        int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(),
+                BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
         mySelectedBitmap = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
 
         ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
@@ -79,7 +81,7 @@ public class ImageDetailActivity extends FragmentActivity {
 
         // get data from db
         DataHelper.ImageData imageData = dbHelper.getImageDataByImageName(myImageName);
-        System.out.println(imageData.key + " " + imageData.date);
+        System.out.println("LOG ImageDetailActivity: image key = " + imageData.key);
 
         // update view content
         TextView myTag = (TextView) findViewById(R.id.imageDetail_tag);
@@ -130,7 +132,8 @@ public class ImageDetailActivity extends FragmentActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 DbHelper dbHelper = new DbHelper(getApplicationContext());
-                Toast.makeText(getApplicationContext(), R.string.toast_ImageDetailActivity_delete, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.toast_ImageDetailActivity_delete,
+                        Toast.LENGTH_SHORT).show();
                 // delete from db
                 dbHelper.deleteSingleImage(myImageName);
                 // delete from storage
@@ -156,7 +159,7 @@ public class ImageDetailActivity extends FragmentActivity {
                 Intent intent;
                 switch (item.getItemId()) {
                     case R.id.photo_filter:
-                        intent = new Intent(ImageDetailActivity.this,ImageEditActivity.class);
+                        intent = new Intent(ImageDetailActivity.this, ImageEditActivity.class);
                         startActivity(intent);
                         break;
                     case R.id.add_note:
@@ -193,7 +196,7 @@ public class ImageDetailActivity extends FragmentActivity {
             mSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    System.out.println("LOG: save the current note");
+                    System.out.println("LOG ImageDetailActivity: save the current note");
                     //Save the note to db
                 }
             });
@@ -220,7 +223,7 @@ public class ImageDetailActivity extends FragmentActivity {
     @Override
     protected void onStop() { // update view mode
         super.onStop();
-        System.out.println("ImageDetailActivity onStop.");
+        System.out.println("LOG ImageDetailActivity: onStop.");
         mySelectedBitmap.recycle();
         ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setImageDrawable(null);
@@ -234,13 +237,14 @@ public class ImageDetailActivity extends FragmentActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        System.out.println("ImageDetailActivity onResume.");
+        System.out.println("LOG ImageDetailActivity: onResume.");
 
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         imagePath = sharedPref.getString(DataHelper.CURRENT_IMAGE_PATH, null);
 
         // scale down the image
-        int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(), BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
+        int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(),
+                BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
         mySelectedBitmap = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
 
         ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
