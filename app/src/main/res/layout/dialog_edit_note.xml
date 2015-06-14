@@ -6,36 +6,33 @@
     android:minWidth="400dp"
     android:minHeight="400dp"
     android:padding="10dp">
-
     <EditText
         android:id="@+id/myNote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@null" />
-
+        android:background="@null"
+        android:inputType="textMultiLine" />
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="end|bottom"
         android:layout_margin="10dp">
 
-        <TextView
+        <Button
             android:id="@+id/cancel"
+            android:background="?android:attr/buttonBarButtonStyle"
             android:text="@string/action_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_20"
-            android:layout_marginRight="10dp"/>
+            android:textSize="@dimen/text_size_20" />
 
-        <TextView
+        <Button
             android:id="@+id/save"
             android:text="@string/action_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_size_20"/>
-
-
     </LinearLayout>
 </LinearLayout>
