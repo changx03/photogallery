@@ -69,13 +69,13 @@ public class ListFragment extends Fragment {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_adapter, parent, false);
             }
 
-            TextView tvLocation = (TextView)convertView.findViewById(R.id.location);
-            TextView tvNote = (TextView)convertView.findViewById(R.id.note);
+            TextView tvLocation = (TextView) convertView.findViewById(R.id.imageDetail_location);
+            TextView tvNote = (TextView) convertView.findViewById(R.id.imageDetail_note);
 
             tvLocation.setText(le.location);
             tvNote.setText(le.note);
 
-            ImageView iv = (ImageView)convertView.findViewById(R.id.image);
+            ImageView iv = (ImageView) convertView.findViewById(R.id.imageDetail_image);
             iv.setImageResource(R.drawable.cat);
 
             iv.setOnClickListener(new View.OnClickListener() {

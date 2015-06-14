@@ -67,7 +67,7 @@ public class ImageDetailActivity extends FragmentActivity {
         int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(), BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
         mySelectedBitmap = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
 
-        ImageView imageView = (ImageView)findViewById(R.id.image);
+        ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         imageView.setImageBitmap(mySelectedBitmap);
         //mySelectedBitmap.recycle();
@@ -77,11 +77,14 @@ public class ImageDetailActivity extends FragmentActivity {
         System.out.println(imageData.key + " " + imageData.date);
 
         // update view content
-        TextView tvLocation = (TextView)findViewById(R.id.location);
-        TextView tvNote = (TextView)findViewById(R.id.note);
-
-        tvLocation.setText("location 1");
-        tvNote.setText("note 1");
+        TextView myTag = (TextView) findViewById(R.id.imageDetail_tag);
+        TextView mylocation = (TextView) findViewById(R.id.imageDetail_location);
+        TextView myNote = (TextView) findViewById(R.id.imageDetail_note);
+        TextView myDate = (TextView) findViewById(R.id.imageDetail_date);
+        myTag.setText(imageData.tag);
+        mylocation.setText(imageData.location);
+        myDate.setText(imageData.date);
+        myNote.setText(imageData.note);
     }
 
     @Override
@@ -183,7 +186,7 @@ public class ImageDetailActivity extends FragmentActivity {
         super.onStop();
         System.out.println("ImageDetailActivity onStop.");
         mySelectedBitmap.recycle();
-        ImageView imageView = (ImageView)findViewById(R.id.image);
+        ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setImageDrawable(null);
 
         SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
@@ -204,7 +207,7 @@ public class ImageDetailActivity extends FragmentActivity {
         int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(), BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
         mySelectedBitmap = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
 
-        ImageView imageView = (ImageView)findViewById(R.id.image);
+        ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         imageView.setImageBitmap(mySelectedBitmap);
     }

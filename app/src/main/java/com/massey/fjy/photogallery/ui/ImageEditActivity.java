@@ -33,7 +33,7 @@ public class ImageEditActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activiy_image_edit);
+        setContentView(R.layout.activity_image_edit);
 
         LinearLayout ll = (LinearLayout)findViewById(R.id.filter_preview_list);
 

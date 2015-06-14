@@ -89,7 +89,9 @@ public class MainActivity extends Activity {
                     String date = DataHelper.getDateTimeToString();
 
                     // add to database
-                    dbHelper.save(null, null, null, null, null, thumbnailImages[i], date, null);
+                    //save(String tag, String location, Float latitude, Float longitude,
+                    //      String note, String imageName, String date, String tagPeople)
+                    dbHelper.save("Initial", "Cat city", null, null, ("Note: " + thumbnailImages[i]), thumbnailImages[i], date, null);
                 }catch (IOException e){
                     e.printStackTrace();
                 }
