@@ -198,7 +198,8 @@ public class ImageEditActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_next:
+            case R.id.action_save:
+
                 return true;
 
         }

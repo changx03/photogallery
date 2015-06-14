@@ -36,7 +36,7 @@ public class ImageDetailActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_solo);
+        setContentView(R.layout.activity_details);
 
         Bundle extras = getIntent().getExtras();
         int currentIndex = 0;
@@ -87,7 +87,7 @@ public class ImageDetailActivity extends FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_solo, menu);
+        getMenuInflater().inflate(R.menu.menu_details, menu);
         return true;
     }
 
