@@ -41,7 +41,6 @@ public class ImageDetailActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_image_detail);
 
         Bundle extras = getIntent().getExtras();
