@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/image_detail_content_padding"
             android:hint="@string/no_content"
-            android:textSize="@dimen/text_size_20"
+            android:textSize="@dimen/text_size_18"
             android:drawableStart="@drawable/ic_action_tag" />
 
         <TextView
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/image_detail_content_padding"
             android:hint="@string/no_content"
-            android:textSize="@dimen/text_size_20"
+            android:textSize="@dimen/text_size_18"
             android:drawableStart="@drawable/ic_action_place" />
 
         <TextView
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/image_detail_content_padding"
             android:hint="@string/no_content"
-            android:textSize="@dimen/text_size_20"
+            android:textSize="@dimen/text_size_18"
             android:drawableStart="@drawable/ic_action_time" />
 
         <TextView
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/image_detail_content_padding"
             android:hint="@string/no_content"
-            android:textSize="@dimen/text_size_20"
+            android:textSize="@dimen/text_size_18"
             android:drawableStart="@drawable/ic_action_note" />
     </LinearLayout>
 </ScrollView>

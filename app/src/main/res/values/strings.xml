@@ -25,4 +25,7 @@
     <string name="image_description">selected image thumbnail</string>
     <string name="no_content">No content</string>
     <string name="toast_ImageDetailActivity_delete">Deleting image...</string>
+    <string name="dialog_edit_editText_hint">Input new notes for this image</string>
+    <string name="toast_ImageDetailActivity_noteUpdate">Updating notes...</string>
+    <string name="action_clear">Clear</string>
 </resources>

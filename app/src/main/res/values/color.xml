@@ -2,4 +2,7 @@
 <resources>
     <color name="grid_state_pressed">#1Affffff</color>
     <color name="grid_state_focused">#80000000</color>
+    <color name="dark_grey">#64dfdfdf</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#ff000000</color>
 </resources>

@@ -1,7 +1,5 @@
 package com.massey.fjy.photogallery.ui;
 
-//import android.app.Activity;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -16,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -31,12 +30,13 @@ import java.io.File;
 import java.util.ArrayList;
 
 
-public class ImageDetailActivity extends FragmentActivity {
+public class ImageDetailActivity extends FragmentActivity implements DialogInterface.OnDismissListener {
     public static final String EXTRA_IMAGE = "extra_image";
 
     private Bitmap mySelectedBitmap;
     private String imagePath;
     private String myImageName;
+    private EditNoteDialog editNoteDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +92,10 @@ public class ImageDetailActivity extends FragmentActivity {
         mylocation.setText(imageData.location);
         myDate.setText(imageData.date);
         myNote.setText(imageData.note);
+
+        editNoteDialog = new EditNoteDialog(this);
+        editNoteDialog.setOnDismissListener(this);
+        editNoteDialog.setTitle("Edit Note");
     }
 
     @Override
@@ -118,7 +122,7 @@ public class ImageDetailActivity extends FragmentActivity {
     }
 
     private void deleteImage() {
-        // build alert dialog
+        // build alert editNoteDialog
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setTitle("Delete image");
         alertBuilder.setMessage("Are you sure you want to delete this image?");
@@ -148,7 +152,7 @@ public class ImageDetailActivity extends FragmentActivity {
         alertBuilder.show();
     }
 
-    private void showEditPopup(View v) {
+    private void showEditPopup(final View v) {
         PopupMenu popup = new PopupMenu(this, v);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.menu_edit_popup, popup.getMenu());
@@ -163,7 +167,7 @@ public class ImageDetailActivity extends FragmentActivity {
                         startActivity(intent);
                         break;
                     case R.id.add_note:
-                        showEditNote();
+                        editNoteDialog.show();
                         break;
                     case R.id.tag_people:
                         break;
@@ -174,33 +178,68 @@ public class ImageDetailActivity extends FragmentActivity {
         popup.show();
     }
 
+    // update view after dismiss edit note editNoteDialog
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        // get data from db
+        DbHelper dbHelper = new DbHelper(this);
+        DataHelper.ImageData imageData = dbHelper.getImageDataByImageName(myImageName);
+        System.out.println("LOG ImageDetailActivity: image key = " + imageData.key);
+
+        // update view content
+        TextView myTag = (TextView) findViewById(R.id.imageDetail_tag);
+        TextView mylocation = (TextView) findViewById(R.id.imageDetail_location);
+        TextView myNote = (TextView) findViewById(R.id.imageDetail_note);
+        TextView myDate = (TextView) findViewById(R.id.imageDetail_date);
+        myTag.setText(imageData.tag);
+        mylocation.setText(imageData.location);
+        myDate.setText(imageData.date);
+        myNote.setText(imageData.note);
+    }
+
     private class EditNoteDialog extends Dialog {
-        private View mContentView;
-        private EditText mNote;
-        private TextView mSave;
-        private TextView mCancel;
+        private Context myContext;
+        private DbHelper dbHelper;
+        private DataHelper.ImageData imageData;
 
         private EditNoteDialog(Context context) {
             super(context);
-            initViews();
+            myContext = context;
         }
 
-        private void initViews() {
-            mContentView = getLayoutInflater().inflate(R.layout.dialog_edit_note, null, false);
-            mNote = (EditText) mContentView.findViewById(R.id.myNote);
-            mCancel = (TextView) mContentView.findViewById(R.id.cancel);
-            mSave = (TextView) mContentView.findViewById(R.id.save);
-            mNote.setText("replace these with real note query from db!!!", TextView.BufferType.EDITABLE);
-
+        @Override
+        public void onCreate(Bundle savedInstanState) {
+            final View mContentView = getLayoutInflater().inflate(R.layout.dialog_edit_note, null, false);
+            final EditText myDialogNote = (EditText) mContentView.findViewById(R.id.dialog_edit_note);
+            Button mCancel = (Button) mContentView.findViewById(R.id.cancel);
+            Button mSave = (Button) mContentView.findViewById(R.id.save);
+            Button mClear = (Button) mContentView.findViewById(R.id.clear);
+            dbHelper = new DbHelper(myContext);
+            imageData = dbHelper.getImageDataByImageName(myImageName);
+            myDialogNote.setText(imageData.note);
             mSave.setClickable(true);
             mSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     System.out.println("LOG ImageDetailActivity: save the current note");
                     //Save the note to db
+                    Toast.makeText(getApplicationContext(), R.string.toast_ImageDetailActivity_noteUpdate,
+                            Toast.LENGTH_SHORT).show();
+
+                    imageData.note = myDialogNote.getText().toString();
+                    dbHelper.update(imageData);
+
+                    //close editNoteDialog
+                    EditNoteDialog.this.cancel();
                 }
             });
-
+            mClear.setClickable(true);
+            mClear.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    myDialogNote.setText(null);
+                }
+            });
             mCancel.setClickable(true);
             mCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -210,14 +249,6 @@ public class ImageDetailActivity extends FragmentActivity {
             });
             super.setContentView(mContentView);
         }
-
-    }
-
-    private void showEditNote() {
-
-        EditNoteDialog dialog = new EditNoteDialog(ImageDetailActivity.this);
-        dialog.setTitle("Edit Note");
-        dialog.show();
     }
 
     @Override
