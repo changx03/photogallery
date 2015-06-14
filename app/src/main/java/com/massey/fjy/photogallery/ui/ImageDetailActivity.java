@@ -1,6 +1,7 @@
 package com.massey.fjy.photogallery.ui;
 
 //import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -119,6 +121,7 @@ public class ImageDetailActivity extends FragmentActivity {
                         startActivity(intent);
                         break;
                     case R.id.add_note:
+                        showEditNote();
                         break;
                     case R.id.tag_people:
                         break;
@@ -127,6 +130,52 @@ public class ImageDetailActivity extends FragmentActivity {
             }
         });
         popup.show();
+    }
+
+    private class EditNoteDialog extends Dialog {
+        private View mContentView;
+        private EditText mNote;
+        private TextView mSave;
+        private TextView mCancel;
+
+        private EditNoteDialog(Context context) {
+            super(context);
+            initViews();
+        }
+
+        private void initViews() {
+            mContentView = getLayoutInflater().inflate(R.layout.dialog_edit_note, null, false);
+            mNote = (EditText) mContentView.findViewById(R.id.myNote);
+            mCancel = (TextView) mContentView.findViewById(R.id.cancel);
+            mSave = (TextView) mContentView.findViewById(R.id.save);
+            mNote.setText("replace these with real note query from db!!!", TextView.BufferType.EDITABLE);
+
+            mSave.setClickable(true);
+            mSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("LOG: save the current note");
+                    //Save the note to db
+                }
+            });
+
+            mCancel.setClickable(true);
+            mCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EditNoteDialog.this.cancel();
+                }
+            });
+            super.setContentView(mContentView);
+        }
+
+    }
+
+    private void showEditNote() {
+
+        EditNoteDialog dialog = new EditNoteDialog(ImageDetailActivity.this);
+        dialog.setTitle("Edit Note");
+        dialog.show();
     }
 
     @Override

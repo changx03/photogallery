@@ -6,4 +6,6 @@
     <dimen name="image_thumbnail_size">100dp</dimen>
     <dimen name="image_thumbnail_spacing">2dp</dimen>
     <dimen name="image_detail_activity_window_height">300dp</dimen>
+
+    <dimen name="text_size_20">20dp</dimen>
 </resources>

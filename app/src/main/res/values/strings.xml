@@ -10,6 +10,8 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_next">Next</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
 
     <string name="photo_filter">Photo Filter</string>
     <string name="add_note">Add Note</string>
