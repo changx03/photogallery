@@ -319,8 +319,6 @@ public class MainActivity extends Activity {
                 switch (item.getItemId()) {
                     case R.id.take_photo:
                         intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        //File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
-                       // intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                         startActivityForResult(intent, REQUEST_CAMERA);
                         break;
                     case R.id.choose_from_library:
@@ -376,8 +374,6 @@ public class MainActivity extends Activity {
 
     private void onCaptureImageResult(Intent data){
         Bitmap bitmap = (Bitmap)data.getExtras().get("data");
-      //  File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
-       // Bitmap bitmap = BitmapHelper.decodeBitmapFromUri(file.getAbsolutePath(), 1000, 700);
 
         if(!saveBitmapToPrivateGallery(bitmap)){
             System.out.println("Photo Capture: Save image failed ");
@@ -470,7 +466,7 @@ public class MainActivity extends Activity {
         editor.putInt(DataHelper.VIEW_MODE, mViewMode);
         editor.putInt(DataHelper.VIEW_BY, mViewBy);
         editor.putString(DataHelper.OPTION_KEY_WORD, mOptionKeyWord);
-        editor.commit();
+        editor.apply();
 
         super.onStop();
     }
