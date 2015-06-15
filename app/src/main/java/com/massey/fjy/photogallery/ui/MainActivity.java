@@ -10,6 +10,12 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.massey.fjy.photogallery.R;
 import com.massey.fjy.photogallery.db.DbHelper;
@@ -35,6 +42,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends Activity {
@@ -399,12 +408,38 @@ public class MainActivity extends Activity {
                 System.out.println("Image saved");
                 success = true;
 
-
+                // get city name
+                Float latitude = null;
+                Float longtitude = null;
+                String cityName = null;
+                Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+                List<Address> addresses = null;
+                try {
+                    // get location
+                    LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+                    MyLocationListener locationChangeListener = new MyLocationListener();
+                    Criteria criteria = new Criteria();
+                    String myProvider = locationManager.getBestProvider(criteria, false);
+                    locationManager.requestLocationUpdates(myProvider, 0, 0, locationChangeListener);
+                    Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                    if (location != null) {
+                        latitude = new Float(location.getLatitude());
+                        longtitude = new Float(location.getLongitude());
+                        addresses = gcd.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                    }
+                    if (addresses != null && addresses.size() > 0) {
+                        cityName = addresses.get(0).getLocality();
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("LOG MainActivitiy saveBitmapToPrivateGallery location = " + cityName);
 
                 // add image to database
                 DbHelper dbHelper = new DbHelper(getApplication());
                 String date = DataHelper.getDateTimeToString();
-                dbHelper.save(null, null, null, null, null, imageName, date, null);
+                dbHelper.save(null, cityName, latitude, longtitude, null, imageName, date, null);
                 System.out.println("MainActivity_date = " + date);
 
             } catch (IOException e) {
@@ -432,8 +467,6 @@ public class MainActivity extends Activity {
                     case R.id.list_view:
                         mViewMode = VIEW_MODE_LIST;
                         showViewFragment(mViewMode, mViewBy, mOptionKeyWord);
-                        break;
-                    case R.id.multiple_select:
                         break;
                 }
                 return true;
@@ -491,4 +524,42 @@ public class MainActivity extends Activity {
             selectItem(position);
         }
     }
+
+    private class MyLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location loc) {
+            // get longitude and latitude
+            String longitude = "Longitude: " + loc.getLongitude();
+            String latitude = "Latitude: " + loc.getLatitude();
+
+            // get city name
+            String cityName = null;
+            Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+            List<Address> addresses;
+            try {
+                addresses = gcd.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+                if (addresses.size() > 0)
+                    System.out.println(addresses.get(0).getLocality());
+                cityName = addresses.get(0).getLocality();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(getApplicationContext(),longitude + " " + latitude + " " + cityName,
+                    Toast.LENGTH_SHORT).show();
+
+            System.out.println("LOG: MainActivity onLocationChanged : " + longitude + " " + latitude + " " + cityName);
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {}
+
+        @Override
+        public void onProviderEnabled(String provider) {}
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+    }
+
 }

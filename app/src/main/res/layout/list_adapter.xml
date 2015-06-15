@@ -12,19 +12,25 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="700px"
-        android:layout_height="350px"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
         >
         <TextView
             android:id="@+id/imageDetail_location"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="test...test...test.."/>
+            android:text="test...test...test.."
+            android:textSize="20sp"
+            android:gravity="center"/>
         <TextView
             android:id="@+id/imageDetail_note"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="test...test..test..."/>
+            android:text="test...test..test..."
+            android:textSize="20sp"
+            android:gravity="center"/>
+
     </LinearLayout>
 
 </LinearLayout>

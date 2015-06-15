@@ -32,7 +32,7 @@ public class ListFragment extends Fragment {
         //imageList get data
         imageList = new ArrayList<>();
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 10; i++)
             imageList.add(new ListElement("location" + i, "note" + i));
     }
 
