@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 public class ImageDetailActivity extends FragmentActivity implements DialogInterface.OnDismissListener {
     public static final String EXTRA_IMAGE = "extra_image";
-
+    public static final String IMAGE_NAME = "image_name";
     private Bitmap mySelectedBitmap;
     private String imagePath;
     private String myImageName;
@@ -47,6 +47,7 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         int currentIndex = 0;
         if(extras != null){
             currentIndex = extras.getInt(EXTRA_IMAGE);
+            myImageName = extras.getString(IMAGE_NAME);
             System.out.println("LOG ImageDetailActivity: currentIndex = " + currentIndex);
         }
 
@@ -54,26 +55,10 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         toast.show();
         SystemClock.sleep(100);
 
-        // get image name from database
+        // get image ful path
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         String photoGalleryPath = sharedPref.getString(DataHelper.PHOTO_GALLERY_FULL_PATH, null);
-        int mViewBy = sharedPref.getInt(DataHelper.VIEW_BY, DataHelper.VIEW_BY_ALL);
-        String optionKeyWord = sharedPref.getString(DataHelper.OPTION_KEY_WORD,
-                getResources().getStringArray(R.array.tags)[0]);
-        ArrayList<String> myImageList = new ArrayList<>();
         DbHelper dbHelper = new DbHelper(this);
-        // get image list by options
-        if (mViewBy == DataHelper.VIEW_BY_ALL) {
-            myImageList = dbHelper.getAllGridView();
-        } else if (mViewBy == DataHelper.VIEW_BY_TAG) {
-            if (optionKeyWord.equals(getResources().getStringArray(R.array.tags)[0])) {
-                myImageList = dbHelper.getAllGridView();
-            } else {
-                myImageList = dbHelper.getImagesByTagGridView(optionKeyWord);
-            }
-        }
-        myImageName = myImageList.get(currentIndex);
-
         imagePath = photoGalleryPath + "/" + myImageName;
         System.out.println("LOG ImageDetailActivity: imagePath = " + imagePath);
 
