@@ -91,8 +91,8 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
                 intent.putExtra(ImageDetailActivity.EXTRA_IMAGE, (int) id);
-
-                System.out.println("id = " + id);
+                intent.putExtra(ImageDetailActivity.IMAGE_NAME, myImageList.get((int) id));
+                System.out.println("id = " + id + " , imageName = " + myImageList.get((int) id));
 
                 // use scale animation
                 ActivityOptions options = ActivityOptions.makeScaleUpAnimation(view, 0, 0, view.getWidth(), view.getHeight());
