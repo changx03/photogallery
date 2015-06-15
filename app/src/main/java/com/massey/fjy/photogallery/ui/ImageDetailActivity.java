@@ -145,6 +145,8 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         switch (item.getItemId()) {
             case R.id.action_export:
                 exportImage();
+                Toast.makeText(getApplicationContext(), "Exporting...",
+                        Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_share:
                 shareImage();
@@ -221,6 +223,8 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         System.out.println("LOG  ImageDetailActivity ExporImage function finished!");
         ll.destroyDrawingCache();
         mySelectedBitmap.recycle();
+
+
         return exportImageFilePath;
     }
 
@@ -251,6 +255,7 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
             }
         };
         t.start();
+        progressDiag.dismiss();
     }
 
     private void exportImage() {

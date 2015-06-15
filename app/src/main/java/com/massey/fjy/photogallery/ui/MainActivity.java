@@ -10,8 +10,14 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -24,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.massey.fjy.photogallery.R;
 import com.massey.fjy.photogallery.db.DbHelper;
@@ -34,6 +41,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends Activity {
@@ -158,6 +167,7 @@ public class MainActivity extends Activity {
         // Create view fragment
         mViewBy = DataHelper.VIEW_BY_ALL;
         mOptionKeyWord = mImageTags[0];
+        System.out.println("mViewMode = " + mViewMode + " mViewBy = " + mViewBy + " mOptionKeyWord = " + mOptionKeyWord);
         showViewFragment(mViewMode, mViewBy, mOptionKeyWord); // read view mode from settings in sharedpreferences
 
         handleIntent(getIntent()); //for search
@@ -190,6 +200,13 @@ public class MainActivity extends Activity {
         Bundle args = new Bundle();
         args.putInt(DataHelper.VIEW_BY, viewBy);
         args.putString(DataHelper.OPTION_KEY_WORD, optionKeyWord);
+
+        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putInt(DataHelper.VIEW_MODE, mViewMode);
+        editor.putInt(DataHelper.VIEW_BY, mViewBy);
+        editor.putString(DataHelper.OPTION_KEY_WORD, mOptionKeyWord);
+        editor.apply();
+
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
         if (mode == 0) {
@@ -302,6 +319,8 @@ public class MainActivity extends Activity {
                 switch (item.getItemId()) {
                     case R.id.take_photo:
                         intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        //File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
+                       // intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                         startActivityForResult(intent, REQUEST_CAMERA);
                         break;
                     case R.id.choose_from_library:
@@ -357,6 +376,8 @@ public class MainActivity extends Activity {
 
     private void onCaptureImageResult(Intent data){
         Bitmap bitmap = (Bitmap)data.getExtras().get("data");
+      //  File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
+       // Bitmap bitmap = BitmapHelper.decodeBitmapFromUri(file.getAbsolutePath(), 1000, 700);
 
         if(!saveBitmapToPrivateGallery(bitmap)){
             System.out.println("Photo Capture: Save image failed ");
@@ -393,6 +414,11 @@ public class MainActivity extends Activity {
                 fos.close();
                 System.out.println("Image saved");
                 success = true;
+
+                // get location
+                LocationManager locationManager = (LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
+                LocationListener locationListener = new MyLocationListener();
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
 
                 // add image to database
                 DbHelper dbHelper = new DbHelper(getApplication());
@@ -444,7 +470,7 @@ public class MainActivity extends Activity {
         editor.putInt(DataHelper.VIEW_MODE, mViewMode);
         editor.putInt(DataHelper.VIEW_BY, mViewBy);
         editor.putString(DataHelper.OPTION_KEY_WORD, mOptionKeyWord);
-        editor.apply();
+        editor.commit();
 
         super.onStop();
     }
@@ -484,4 +510,42 @@ public class MainActivity extends Activity {
             selectItem(position);
         }
     }
+
+    private class MyLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location loc) {
+            // get longitude and latitude
+            String longitude = "Longitude: " + loc.getLongitude();
+            String latitude = "Latitude: " + loc.getLatitude();
+
+            // get city name
+            String cityName = null;
+            Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+            List<Address> addresses;
+            try {
+                addresses = gcd.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+                if (addresses.size() > 0)
+                    System.out.println(addresses.get(0).getLocality());
+                cityName = addresses.get(0).getLocality();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(getApplicationContext(),longitude + " " + latitude + " " + cityName,
+                    Toast.LENGTH_SHORT).show();
+
+            System.out.println("LOG: MainActivity onLocationChanged : " + longitude + " " + latitude + " " + cityName);
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {}
+
+        @Override
+        public void onProviderEnabled(String provider) {}
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+    }
+
 }
