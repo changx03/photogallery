@@ -213,9 +213,10 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
 
     @Override
     protected void onStop() { // update view mode
-        super.onStop();
         System.out.println("LOG ImageDetailActivity: onStop.");
-        mySelectedBitmap.recycle();
+        if (mySelectedBitmap != null) {
+            mySelectedBitmap.recycle();
+        }
         ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setImageDrawable(null);
 
@@ -223,11 +224,11 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         editor.putString(DataHelper.CURRENT_IMAGE_PATH, imagePath);
 
         editor.apply();
+        super.onStop();
     }
 
     @Override
     protected void onResume(){
-        super.onResume();
         System.out.println("LOG ImageDetailActivity: onResume.");
 
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
@@ -241,6 +242,8 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         imageView.setImageBitmap(mySelectedBitmap);
+
+        super.onResume();
     }
 
     public static class EditTagDialog extends DialogFragment {
