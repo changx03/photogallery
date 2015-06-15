@@ -25,6 +25,9 @@ import com.massey.fjy.photogallery.utils.DataHelper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 public class GridFragment extends Fragment implements AbsListView.OnScrollListener {
@@ -83,11 +86,14 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
             myImageList = dbHelper.searchImagesGridView(optionKeyWord);
         }
 
-        SystemClock.sleep(100);
-
         myAsyncTaskLoader.cancel(true);
         myAsyncTaskLoader = new AsyncTaskLoadFiles(myImgAdapter);
         myAsyncTaskLoader.execute();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -158,7 +164,6 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
 
             @Override
         protected Void doInBackground(Void... params) {
-
                 for (String imageName : myImageList) {
                 String filePath = targetDir + "/" + imageName;
                 publishProgress(filePath);
