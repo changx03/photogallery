@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:gravity="center_vertical"
-            android:hint="@string/edit_tagview"
+            android:hint="@string/text_tagview"
             android:singleLine="true"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"

@@ -30,7 +30,7 @@ public class TagLayout extends RelativeLayout implements TextView.OnEditorAction
     private InputMethodManager imm;
     // width height
     public static final int ViewWidth = 200;
-    public static final int ViewHeight = 50;
+    public static final int ViewHeight = 80;
     public TagLayout(Context context, Direction direction) {
         super(context);
         this.direction = direction;

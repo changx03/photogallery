@@ -7,6 +7,7 @@
     <com.massey.fjy.photogallery.utils.TagImageLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/tag_image_layout"
         >
         <ImageView
             android:id="@+id/tag_image"
