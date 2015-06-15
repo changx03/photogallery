@@ -8,9 +8,6 @@ import android.os.Build;
 
 import java.io.File;
 
-/**
- * Created by Luke on 12/06/2015.
- */
 public class BitmapHelper {
     public static final int IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT = 300;  //R.dimen.image_detail_activity_window_height
     public static final int IMAGE_THUMBNAIL_SIZE = 100;//R.dimen.image_thumbnail_size

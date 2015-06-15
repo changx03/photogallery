@@ -2,9 +2,6 @@ package com.massey.fjy.photogallery.db;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by Luke on 12/06/2015.
- */
 public class DbTableContract {
     private DbTableContract(){} // constructor
 

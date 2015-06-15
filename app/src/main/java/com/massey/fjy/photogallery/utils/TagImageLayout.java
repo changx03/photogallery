@@ -12,10 +12,6 @@ import android.widget.Toast;
 
 import com.massey.fjy.photogallery.R;
 
-/**
- * Created by fangjingyuan on 6/15/15.
- */
-
 public class TagImageLayout extends RelativeLayout implements View.OnTouchListener {
 
     private View touchView, clickView;

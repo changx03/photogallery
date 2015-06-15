@@ -3,9 +3,6 @@ package com.massey.fjy.photogallery.utils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by Luke on 13/06/2015.
- */
 public class DataHelper {
     public static final String IMAGE_DIR = "photoGallery";
 

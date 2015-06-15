@@ -13,9 +13,6 @@ import android.widget.TextView;
 
 import com.massey.fjy.photogallery.R;
 
-/**
- * Created by fangjingyuan on 6/14/15.
- */
 public class TagLayout extends RelativeLayout implements TextView.OnEditorActionListener {
     // input status
     public enum InputStatus{Normal, Edit};

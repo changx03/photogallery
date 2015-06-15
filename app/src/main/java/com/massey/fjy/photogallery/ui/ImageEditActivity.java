@@ -27,10 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by fangjingyuan on 6/12/15.
- */
-
 public class ImageEditActivity extends Activity {
     private Bitmap resourceImage;
     private boolean clickFilter[];

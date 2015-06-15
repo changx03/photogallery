@@ -11,9 +11,6 @@ import com.massey.fjy.photogallery.utils.DataHelper;
 
 import java.util.ArrayList;
 
-/**
- * Created by Luke on 12/06/2015.
- */
 public class DbHelper extends SQLiteOpenHelper{
     public DbHelper(Context context) {
         super(context, DbTableContract.DB_NAME, null, DbTableContract.DB_VERSION);

@@ -15,9 +15,6 @@ import android.graphics.Shader;
 
 import java.util.Random;
 
-/**
- * Created by fangjingyuan on 6/13/15.
- */
 public class FilterHelper {
     public Bitmap applyHighlightEffect(Bitmap src) {
 
