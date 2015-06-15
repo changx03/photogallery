@@ -80,7 +80,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 " FROM " + PhotoGalleryTable.DB_TABLE_NAME +
                 " WHERE " + PhotoGalleryTable.FIELD_TAG +
                 " = '" + tag + "'" +
-                " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " ASC", null);
+                " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " DESC", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             imageList.add(cursor.getString(cursor.getColumnIndex(PhotoGalleryTable.FIELD_IMAGE_NAME)));
@@ -99,7 +99,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 " FROM " + PhotoGalleryTable.DB_TABLE_NAME +
                 " WHERE " + PhotoGalleryTable.FIELD_TAG +
                 " = '" + tag + "'" +
-                " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " ASC", null);
+                " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " DESC", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             DataHelper.ImageData imageData = getImageDataByCursor(cursor);
