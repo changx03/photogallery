@@ -43,4 +43,16 @@
         <item>Sports</item>
         <item>Travel</item>
     </string-array>
+    <string-array name="thumbnailImages">
+        <item>thumbnail_0.jpg</item>
+        <item>thumbnail_1.jpg</item>
+        <item>thumbnail_2.jpg</item>
+        <item>thumbnail_3.jpg</item>
+        <item>thumbnail_4.jpg</item>
+        <item>thumbnail_5.jpg</item>
+        <item>thumbnail_6.jpg</item>
+        <item>thumbnail_7.jpg</item>
+        <item>thumbnail_8.jpg</item>
+        <item>thumbnail_9.jpg</item>
+    </string-array>
 </resources>

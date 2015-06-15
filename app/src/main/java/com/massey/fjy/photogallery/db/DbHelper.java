@@ -33,7 +33,7 @@ public class DbHelper extends SQLiteOpenHelper{
 
     public Long save(String tag, String location, Float latitude, Float longitude,
                      String note, String imageName, String date, String tagPeople){
-        Long rowId = null;
+        Long rowId;
         if(imageName.isEmpty()) {
             return (long) -1;
         }
@@ -72,14 +72,62 @@ public class DbHelper extends SQLiteOpenHelper{
         return imageList;
     }
 
+    public ArrayList<String> getImagesByTagGridView(String tag) {
+        ArrayList<String> imageList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        // selesct * from [table_name] where tag ='tag' order by date asc
+        Cursor cursor = db.rawQuery("SELECT * " +
+                " FROM " + PhotoGalleryTable.DB_TABLE_NAME +
+                " WHERE " + PhotoGalleryTable.FIELD_TAG +
+                " = '" + tag + "'" +
+                " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " ASC", null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            imageList.add(cursor.getString(cursor.getColumnIndex(PhotoGalleryTable.FIELD_IMAGE_NAME)));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        db.close();
+        return imageList;
+    }
+
+    public ArrayList<DataHelper.ImageData> getImagesByTag(String tag) {
+        ArrayList<DataHelper.ImageData> imageList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        // selesct * from [table_name] where tag ='tag' order by date asc
+        Cursor cursor = db.rawQuery("SELECT * " +
+                " FROM " + PhotoGalleryTable.DB_TABLE_NAME +
+                " WHERE " + PhotoGalleryTable.FIELD_TAG +
+                " = '" + tag + "'" +
+                " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " ASC", null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            DataHelper.ImageData imageData = getImageDataByCursor(cursor);
+            imageList.add(imageData);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        db.close();
+        return imageList;
+    }
+
     public DataHelper.ImageData getImageDataByImageName(String imageName){
-        DataHelper.ImageData imageData = new DataHelper.ImageData();
+        DataHelper.ImageData imageData;
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + PhotoGalleryTable.DB_TABLE_NAME +
                 " WHERE " + PhotoGalleryTable.FIELD_IMAGE_NAME +
-                "='" + imageName + "'", null);
+                "= '" + imageName + "'", null);
         cursor.moveToFirst();
-        if(!cursor.isAfterLast()){
+        imageData = getImageDataByCursor(cursor);
+        cursor.close();
+        db.close();
+        System.out.println("DbHelper_key = " + imageData.key);
+        return imageData;
+    }
+
+    private DataHelper.ImageData getImageDataByCursor(Cursor cursor) {
+        DataHelper.ImageData imageData = new DataHelper.ImageData();
+        if (!cursor.isAfterLast()) {
             imageData.key = cursor.getLong(cursor.getColumnIndex(PhotoGalleryTable.FIELD_KEY));
             imageData.imageName = cursor.getString(cursor.getColumnIndex(PhotoGalleryTable.FIELD_IMAGE_NAME));
             imageData.date = cursor.getString(cursor.getColumnIndex(PhotoGalleryTable.FIELD_DATE));
@@ -90,9 +138,6 @@ public class DbHelper extends SQLiteOpenHelper{
             imageData.note = cursor.getString(cursor.getColumnIndex(PhotoGalleryTable.FIELD_NOTE));
             imageData.tagPeople = cursor.getString(cursor.getColumnIndex(PhotoGalleryTable.FIELD_TAG_PEOPLE));
         }
-        cursor.close();
-        db.close();
-        System.out.println("DbHelper_key = " + imageData.key);
         return imageData;
     }
 
