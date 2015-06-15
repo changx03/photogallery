@@ -168,6 +168,7 @@ public class MainActivity extends Activity {
         // Create view fragment
         mViewBy = DataHelper.VIEW_BY_ALL;
         mOptionKeyWord = mImageTags[0];
+        System.out.println("mViewMode = " + mViewMode + " mViewBy = " + mViewBy + " mOptionKeyWord = " + mOptionKeyWord);
         showViewFragment(mViewMode, mViewBy, mOptionKeyWord); // read view mode from settings in sharedpreferences
 
         handleIntent(getIntent()); //for search
@@ -200,19 +201,30 @@ public class MainActivity extends Activity {
         Bundle args = new Bundle();
         args.putInt(DataHelper.VIEW_BY, viewBy);
         args.putString(DataHelper.OPTION_KEY_WORD, optionKeyWord);
+
+        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putInt(DataHelper.VIEW_MODE, mViewMode);
+        editor.putInt(DataHelper.VIEW_BY, mViewBy);
+        editor.putString(DataHelper.OPTION_KEY_WORD, mOptionKeyWord);
+        editor.apply();
+
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
-        if (mode == 0) {
-            GridFragment gf = new GridFragment();
+//        if (mode == 0) {
+//            GridFragment gf = new GridFragment();
+//            gf.setArguments(args);
+//            ft.replace(R.id.container, gf, "grid_view");
+//            ft.commit();
+//        } else if (mode == 1){
+//            ListFragment lf = new ListFragment();
+//            lf.setArguments(args);
+//            ft.replace(R.id.container, lf, "list_view");
+//            ft.commit();
+//        }
+        GridFragment gf = new GridFragment();
             gf.setArguments(args);
             ft.replace(R.id.container, gf, "grid_view");
             ft.commit();
-        } else if (mode == 1){
-            ListFragment lf = new ListFragment();
-            lf.setArguments(args);
-            ft.replace(R.id.container, lf, "list_view");
-            ft.commit();
-        }
     }
 
     /** Swaps fragments in the main content view */
@@ -312,8 +324,6 @@ public class MainActivity extends Activity {
                 switch (item.getItemId()) {
                     case R.id.take_photo:
                         intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        //File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
-                       // intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                         startActivityForResult(intent, REQUEST_CAMERA);
                         break;
                     case R.id.choose_from_library:
@@ -369,8 +379,6 @@ public class MainActivity extends Activity {
 
     private void onCaptureImageResult(Intent data){
         Bitmap bitmap = (Bitmap)data.getExtras().get("data");
-      //  File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
-       // Bitmap bitmap = BitmapHelper.decodeBitmapFromUri(file.getAbsolutePath(), 1000, 700);
 
         if(!saveBitmapToPrivateGallery(bitmap)){
             System.out.println("Photo Capture: Save image failed ");

@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.massey.fjy.photogallery.db.DbHelper;
 import com.massey.fjy.photogallery.R;
@@ -34,7 +35,9 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
     private ImageAdapter myImgAdapter;
     private AsyncTaskLoadFiles myAsyncTaskLoader;
     private GridView mGridView;
+    private ListView mListView;
     private DbHelper dbHelper;
+    private Integer mViewMode;
     private ArrayList<String> myImageList;
 
     // image options
@@ -59,19 +62,29 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
         mViewBy = bundle.getInt(DataHelper.VIEW_BY, 0);
         optionKeyWord = bundle.getString(DataHelper.OPTION_KEY_WORD, getResources().getStringArray(R.array.tags)[0]);
         System.out.println("mViewBy = " + mViewBy + " optionKeyWord = " + optionKeyWord);
+
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
+        mViewMode = sharedPref.getInt(DataHelper.VIEW_MODE, 0);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View view = inflater.inflate(R.layout.fragment_grid, container, false);
-        System.out.println("LOG GridFragment onCreateView");
-
-        mGridView = (GridView)view.findViewById(R.id.myGrid);
-        mGridView.setOnScrollListener(this);
+        View view;
         myImgAdapter = new ImageAdapter(getActivity());
-        mGridView.setAdapter(myImgAdapter);
+        if(mViewMode == 0){
+            view = inflater.inflate(R.layout.fragment_grid, container, false);
+            mGridView = (GridView)view.findViewById(R.id.myGrid);
+            mGridView.setOnScrollListener(this);
+            mGridView.setAdapter(myImgAdapter);
+        }else{
+            view = inflater.inflate(R.layout.fragment_list, container, false);
+            mListView = (ListView)view.findViewById(R.id.myList);
+            mListView.setOnScrollListener(this);
+            mListView.setAdapter(myImgAdapter);
+        }
+        System.out.println("LOG GridFragment onCreateView");
 
         // get image list by options
         if (mViewBy == DataHelper.VIEW_BY_ALL) {
@@ -94,8 +107,22 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
+        if(mViewMode == 0)
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
+                intent.putExtra(ImageDetailActivity.EXTRA_IMAGE, (int) id);
+                intent.putExtra(ImageDetailActivity.IMAGE_NAME, myImageList.get((int) id));
+                System.out.println("id = " + id + " , imageName = " + myImageList.get((int) id));
+
+                // use scale animation
+                ActivityOptions options = ActivityOptions.makeScaleUpAnimation(view, 0, 0, view.getWidth(), view.getHeight());
+                getActivity().startActivity(intent, options.toBundle());
+            }
+        });
+        else
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
@@ -117,11 +144,21 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
         System.out.println("LOG GridFragment onPause");
         myAsyncTaskLoader.cancel(true);
         myImgAdapter = null;
-        int counts = mGridView.getCount();
-        for (int i = 0; i < counts; i++) {
-            ImageView imageView = (ImageView) mGridView.getChildAt(i);
-            if (imageView != null) {
-                if (imageView.getDrawable() != null) imageView.getDrawable().setCallback(null);
+        if(mViewMode == 0) {
+            int counts = mGridView.getCount();
+            for (int i = 0; i < counts; i++) {
+                ImageView imageView = (ImageView) mGridView.getChildAt(i);
+                if (imageView != null) {
+                    if (imageView.getDrawable() != null) imageView.getDrawable().setCallback(null);
+                }
+            }
+        }else {
+            int counts = mListView.getCount();
+            for (int i = 0; i < counts; i++) {
+                ImageView imageView = (ImageView) mListView.getChildAt(i);
+                if (imageView != null) {
+                    if (imageView.getDrawable() != null) imageView.getDrawable().setCallback(null);
+                }
             }
         }
     }
