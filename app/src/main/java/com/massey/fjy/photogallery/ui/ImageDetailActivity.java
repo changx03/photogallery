@@ -185,6 +185,7 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
                         break;
                     case R.id.tag_people:
                         intent = new Intent(ImageDetailActivity.this, ImageAddTagActivity.class);
+                        intent.putExtra(IMAGE_NAME, myImageName);
                         startActivity(intent);
                         break;
                 }

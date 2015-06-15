@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.massey.fjy.photogallery.R;
+import com.massey.fjy.photogallery.db.DbHelper;
 import com.massey.fjy.photogallery.utils.BitmapHelper;
 import com.massey.fjy.photogallery.utils.DataHelper;
 import com.massey.fjy.photogallery.utils.TagImageLayout;
@@ -38,15 +39,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAddTagActivity extends Activity {
-    String imagePath;
+//    public static final String IMAGE_NAME = "image_name";
+    String imagePath, myImageName;
     Bitmap resourceImage;
     ProgressDialog progressDiag;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_add_tag);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            myImageName = extras.getString(ImageDetailActivity.IMAGE_NAME);
+        }
+        System.out.println("LOG myImageName = " + myImageName);
         // get current image path from sharePreferences
         SharedPreferences prefs = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         imagePath = prefs.getString(DataHelper.CURRENT_IMAGE_PATH, null);
@@ -139,6 +147,14 @@ public class ImageAddTagActivity extends Activity {
     private void saveAndClearTags() {
         TagImageLayout tagImage = (TagImageLayout)findViewById(R.id.tag_image_layout);
         String tagsContentResult = getTagsContent(tagImage); // Get All content
+
+        System.out.println(myImageName);
+
+        DbHelper dbHelper = new DbHelper(this);
+        DataHelper.ImageData imageData = dbHelper.getImageDataByImageName(myImageName);
+        imageData.tagPeople = tagsContentResult;
+        dbHelper.update(imageData);
+
         System.out.println("LOG: tags content" + tagsContentResult);
     }
 
