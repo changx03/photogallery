@@ -323,6 +323,7 @@ public class MainActivity extends Activity {
 
         // reset tag option
         mOptionKeyWord = mImageTags[0];
+        mViewBy = DataHelper.VIEW_BY_ALL;
 
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_FILE) {
