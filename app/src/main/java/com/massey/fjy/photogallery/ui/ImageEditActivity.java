@@ -202,6 +202,7 @@ public class ImageEditActivity extends Activity {
                         e.printStackTrace();
                     }
                 }
+                outImage.recycle();
 
             }
 

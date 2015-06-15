@@ -3,12 +3,20 @@ package com.massey.fjy.photogallery.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.media.Image;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.DialogFragment;
@@ -21,6 +29,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +40,8 @@ import com.massey.fjy.photogallery.utils.BitmapHelper;
 import com.massey.fjy.photogallery.utils.DataHelper;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class ImageDetailActivity extends FragmentActivity implements DialogInterface.OnDismissListener {
     public static final String EXTRA_IMAGE = "extra_image";
@@ -40,6 +51,7 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
     private String myImageName;
     private EditNoteDialog editNoteDialog;
     private EditTagDialog editTagDialog;
+    private ProgressDialog progressDiag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +121,19 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
     }
 
     @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            MenuItem item = menu.findItem(R.id.action_export);
+            item.setEnabled(false);
+            item.getIcon().setAlpha(50);
+            item = menu.findItem(R.id.action_share);
+            item.setEnabled(false);
+            item.getIcon().setAlpha(50);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_image_detail, menu);
@@ -118,7 +143,11 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_export:
+                exportImage();
+                return true;
             case R.id.action_share:
+                shareImage();
                 return true;
             case R.id.action_edit:
                 showEditPopup(findViewById(item.getItemId()));
@@ -129,6 +158,104 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void shareImage() {
+        String imagePath = ExportImage();
+        System.out.println("LOG ImageDetailActivity shareImage imagepath = " + imagePath);
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("image/*");
+        share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(imagePath)));
+        startActivity(Intent.createChooser(share, "Share Image"));
+    }
+
+    private class ExportImageToFileTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            ExportImage();
+            return null;
+        }
+        @Override
+        protected void onPreExecute() {
+            ShowProgressDialog();
+        }
+    }
+
+
+    private String ExportImage() {
+        String exportImageFilePath = "";
+        LinearLayout ll = (LinearLayout)findViewById(R.id.imageDetail_layout);
+        System.out.println("LOG: ImageDetailActivity ExportImage ll = " + ll);
+        ll.buildDrawingCache();
+        ll.setDrawingCacheEnabled(true);
+
+        Bitmap outImage = ll.getDrawingCache();
+        System.out.println("LOG: ImageDetailActivity ExportImage bitmap = " + outImage);
+        System.out.println("LOG: save a new image size = " + BitmapHelper.getByteSizeOf(outImage));
+
+        FileOutputStream out = null;
+
+        try {
+            String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+            exportImageFilePath = filePath + "/export_"  + myImageName;
+            System.out.println("LOG ImageDetailActivity ExportImage externalImagePath = " + exportImageFilePath);
+            out = new FileOutputStream(exportImageFilePath);
+            outImage.compress(Bitmap.CompressFormat.JPEG, 85, out);
+
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            File f = new File(exportImageFilePath);
+            Uri contentUri = Uri.fromFile(f);
+            mediaScanIntent.setData(contentUri);
+            this.sendBroadcast(mediaScanIntent);
+
+            System.out.println("LOG  ImageDetailActivity ExporImage finished!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("LOG  ImageDetailActivity ExporImage function finished!");
+        ll.destroyDrawingCache();
+        mySelectedBitmap.recycle();
+        return exportImageFilePath;
+    }
+
+    private void ShowProgressDialog() {
+        progressDiag = new ProgressDialog(this);
+        progressDiag.setMessage("Saving...");
+        progressDiag.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDiag.setIndeterminate(true);
+        progressDiag.setProgress(0);
+        progressDiag.show();
+
+        final int totalProgressTime = 100;
+        final Thread t = new Thread() {
+            @Override
+            public void run() {
+                int jumpTime = 0;
+
+                while(jumpTime < totalProgressTime) {
+                    try {
+                        sleep(200);
+                        jumpTime += 5;
+                        progressDiag.setProgress(jumpTime);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        t.start();
+    }
+
+    private void exportImage() {
+        ExportImageToFileTask task = new ExportImageToFileTask();
+        task.execute();
     }
 
     private void deleteImage() {

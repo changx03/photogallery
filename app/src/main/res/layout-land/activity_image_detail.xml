@@ -6,7 +6,8 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/imageDetail_landscape_layout">
 
         <ImageView
             android:id="@+id/imageDetail_image"
