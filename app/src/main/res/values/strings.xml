@@ -15,6 +15,7 @@
     <string name="action_undo">Undo</string>
 
     <string name="photo_filter">Photo Filter</string>
+    <string name="edit_tag">Edit Category</string>
     <string name="add_note">Add Note</string>
     <string name="tag_people">Tag People</string>
     <string name="edit_tagview">Edit</string>
@@ -32,6 +33,7 @@
     <string name="action_clear">Clear</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="edit_tag_title">Pick a Tag</string>
 
     <string-array name="tags">
         <item>All</item>

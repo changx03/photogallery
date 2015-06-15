@@ -1,5 +1,6 @@
 package com.massey.fjy.photogallery.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -8,8 +9,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,8 +31,6 @@ import com.massey.fjy.photogallery.utils.BitmapHelper;
 import com.massey.fjy.photogallery.utils.DataHelper;
 
 import java.io.File;
-import java.util.ArrayList;
-
 
 public class ImageDetailActivity extends FragmentActivity implements DialogInterface.OnDismissListener {
     public static final String EXTRA_IMAGE = "extra_image";
@@ -37,6 +39,7 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
     private String imagePath;
     private String myImageName;
     private EditNoteDialog editNoteDialog;
+    private EditTagDialog editTagDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +98,12 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         editNoteDialog = new EditNoteDialog(this);
         editNoteDialog.setOnDismissListener(this);
         editNoteDialog.setTitle("Edit Note");
+
+        Bundle args = new Bundle();
+        args.putString(IMAGE_NAME, myImageName);
+        editTagDialog = new EditTagDialog();
+        editTagDialog.setArguments(args);
+        editNoteDialog.setOnDismissListener(this);
 
         getActionBar().setIcon(android.R.color.transparent);
     }
@@ -167,6 +176,10 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
                         intent = new Intent(ImageDetailActivity.this, ImageEditActivity.class);
                         startActivity(intent);
                         break;
+                    case R.id.edit_tag:
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        editTagDialog.show(ft, "dialog");
+                        break;
                     case R.id.add_note:
                         editNoteDialog.show();
                         break;
@@ -181,7 +194,7 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         popup.show();
     }
 
-    // update view after dismiss edit note editNoteDialog
+    // update view after dismiss Dialog
     @Override
     public void onDismiss(DialogInterface dialog) {
         // get data from db
@@ -191,11 +204,11 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
 
         // update view content
         TextView myTag = (TextView) findViewById(R.id.imageDetail_tag);
-        TextView mylocation = (TextView) findViewById(R.id.imageDetail_location);
+        TextView myLocation = (TextView) findViewById(R.id.imageDetail_location);
         TextView myNote = (TextView) findViewById(R.id.imageDetail_note);
         TextView myDate = (TextView) findViewById(R.id.imageDetail_date);
         myTag.setText(imageData.tag);
-        mylocation.setText(imageData.location);
+        myLocation.setText(imageData.location);
         myDate.setText(imageData.date);
         myNote.setText(imageData.note);
     }
@@ -230,6 +243,45 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         imageView.setImageBitmap(mySelectedBitmap);
+    }
+
+    public static class EditTagDialog extends DialogFragment {
+        private String myImageName;
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            myImageName = getArguments().getString(IMAGE_NAME);
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.edit_tag_title)
+                    .setItems(R.array.tags, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // The 'which' argument contains the index position
+                            // of the selected item
+                            String updatedTag = getResources().getStringArray(R.array.tags)[which];
+                            System.out.println("LOG ImageDetailActivity: new tag = " + updatedTag);
+                            DbHelper dbHelper = new DbHelper(getActivity());
+                            DataHelper.ImageData imageData = dbHelper.getImageDataByImageName(myImageName);
+                            imageData.tag = updatedTag;
+                            dbHelper.update(imageData);
+                        }
+                    });
+            return builder.create();
+        }
+
+        @Override
+        public void onDismiss(final DialogInterface dialog) {
+            super.onDismiss(dialog);
+            final Activity activity = getActivity();
+            if (activity instanceof DialogInterface.OnDismissListener) {
+                ((DialogInterface.OnDismissListener) activity).onDismiss(dialog);
+            }
+        }
     }
 
     private class EditNoteDialog extends Dialog {
