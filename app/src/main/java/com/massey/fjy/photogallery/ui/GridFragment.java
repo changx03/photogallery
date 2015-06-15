@@ -32,6 +32,11 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
     private AsyncTaskLoadFiles myAsyncTaskLoader;
     private GridView mGridView;
     private DbHelper dbHelper;
+    private ArrayList<String> myImageList;
+
+    // image options
+    private int mViewBy;
+    private String optionKeyWord;
 
     public GridFragment() {
         // Required empty public constructor
@@ -44,6 +49,11 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
 
         dbHelper = new DbHelper(context);
         myAsyncTaskLoader = new AsyncTaskLoadFiles(myImgAdapter);
+
+        // get image options from bundle
+        Bundle bundle = this.getArguments();
+        mViewBy = bundle.getInt(DataHelper.VIEW_BY, 0);
+        optionKeyWord = bundle.getString(DataHelper.OPTION_KEY_WORD, getResources().getStringArray(R.array.tags)[0]);
     }
 
     @Override
@@ -58,6 +68,17 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
         mGridView.setOnScrollListener(this);
         myImgAdapter = new ImageAdapter(getActivity());
         mGridView.setAdapter(myImgAdapter);
+
+        // get image list by options
+        if (mViewBy == DataHelper.VIEW_BY_ALL) {
+            myImageList = dbHelper.getAllGridView();
+        } else if (mViewBy == DataHelper.VIEW_BY_TAG) {
+            if (optionKeyWord.equals(getResources().getStringArray(R.array.tags)[0])) {
+                myImageList = dbHelper.getAllGridView();
+            } else {
+                myImageList = dbHelper.getImagesByTagGridView(optionKeyWord);
+            }
+        }
 
         SystemClock.sleep(100);
 
@@ -78,7 +99,6 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
                 getActivity().startActivity(intent, options.toBundle());
             }
         });
-
         return view;
     }
 
@@ -105,16 +125,20 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
     }
 
+    private static class ViewHolder {
+        ImageView image;
+        int position;
+    }
+
         public class AsyncTaskLoadFiles extends AsyncTask<Void, String, Void>{
         private File targetDir;
         private ImageAdapter myTaskAdapter;
-        private ArrayList<String> imageNames;
-        
+
         public AsyncTaskLoadFiles(ImageAdapter adapter){
             myTaskAdapter = adapter;
         }
-        
-        @Override
+
+            @Override
         protected void onPreExecute(){
             super.onPreExecute();
 
@@ -127,15 +151,12 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
             System.out.println("targetDir = " + targetDir);
 
             myTaskAdapter.clear();
-
-            imageNames = dbHelper.getAllGridView();
-
         }
-        
-        @Override
+
+            @Override
         protected Void doInBackground(Void... params) {
 
-            for(String imageName : imageNames){
+                for (String imageName : myImageList) {
                 String filePath = targetDir + "/" + imageName;
                 publishProgress(filePath);
                 if(isCancelled())
@@ -239,10 +260,5 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
 //        public void remove(int index){
 //            itemList.remove(index);
 //        }
-    }
-
-    private static class ViewHolder {
-        ImageView image;
-        int position;
     }
 }

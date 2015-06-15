@@ -6,16 +6,22 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.SearchView;
 
@@ -47,39 +53,39 @@ public class MainActivity extends Activity {
             R.drawable.img_8,
             R.drawable.img_9,
     };
-    private String[] thumbnailImages = {
-            "thumbnail_0.jpg",
-            "thumbnail_1.jpg",
-            "thumbnail_2.jpg",
-            "thumbnail_3.jpg",
-            "thumbnail_4.jpg",
-            "thumbnail_5.jpg",
-            "thumbnail_6.jpg",
-            "thumbnail_7.jpg",
-            "thumbnail_8.jpg",
-            "thumbnail_9.jpg"
-    };
+
+    // navigation drawer
+    private String[] mImageTags;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private CharSequence mTitle;
+    private CharSequence mDrawerTitle;
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private int mViewBy;
+    private String mPptionKeyWord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // provide some initial testing images
         DbHelper dbHelper = new DbHelper(this);
         String photoGalleryPath = getFilesDir() + "/" + DataHelper.IMAGE_DIR;
         File photoGalleryDir = new File(photoGalleryPath);
-        if(!photoGalleryDir.exists()) {
+        if (!photoGalleryDir.exists()) {
             photoGalleryDir.mkdir();
-            for(int i = 0; i < mImgIds.length; i++){
+            for (int i = 0; i < mImgIds.length; i++) {
                 // loading smaller image into private gallery folder. Nexus 5 emulator seems doesn't have enough memory for full size
                 Bitmap mImg = BitmapHelper.decodeBitmapFromResource(getResources(), mImgIds[i], 640, 480);
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 mImg.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-                File destination = new File(photoGalleryDir, thumbnailImages[i]);
+                File destination = new File(photoGalleryDir, getResources().getStringArray(R.array.thumbnailImages)[i]);
                 mImg.recycle();
 
                 FileOutputStream fos;
-                try{
+                try {
                     destination.createNewFile();
                     fos = new FileOutputStream(destination);
                     fos.write(bytes.toByteArray());
@@ -87,41 +93,134 @@ public class MainActivity extends Activity {
 
                     //get date
                     String date = DataHelper.getDateTimeToString();
-
                     // add to database
-                    //save(String tag, String location, Float latitude, Float longitude,
-                    //      String note, String imageName, String date, String tagPeople)
-                    dbHelper.save("Initial", "Cat city", null, null, ("Note: " + thumbnailImages[i]), thumbnailImages[i], date, null);
-                }catch (IOException e){
+                    //save(tag,location,latitude,longitude, note, imageName, date, tagPeople)
+                    Long save = dbHelper.save(getResources().getStringArray(R.array.tags)[i],
+                            "Cat city",
+                            (float) 999.999,
+                            (float) 666.666,
+                            ("Note: " + getResources().getStringArray(R.array.thumbnailImages)[i]),
+                            getResources().getStringArray(R.array.thumbnailImages)[i], date, null);
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+
         // save gallery path
         SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
         editor.putString(DataHelper.PHOTO_GALLERY_FULL_PATH, photoGalleryPath);
         editor.apply();
 
+        // navigation drawer
+        mTitle = mDrawerTitle = getTitle();
+        mImageTags = getResources().getStringArray(R.array.tags);
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        System.out.println("LOG MainActivity mDrawerLayout = " + mDrawerLayout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        System.out.println("LOG MainActivity mDrawerList = " + mDrawerList);
+        mDrawerList.setAdapter(new ArrayAdapter<>(this,
+                R.layout.drawer_list_item, mImageTags));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                R.drawable.ic_action_navigation_menu,
+                R.string.drawer_open,
+                R.string.drawer_close) {
+            // Called when a drawer has settled in a completely closed state
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getActionBar().setTitle(mTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            // Called when a drawer has settled in a completely open state
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        getActionBar().setIcon(android.R.color.transparent);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
         // get view mode
         SharedPreferences settings = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         mViewMode = settings.getInt(DataHelper.VIEW_MODE, VIEW_MODE_GRID);   // use fragment_grid view as default
-        showViewFragment(mViewMode); // read view mode from settings in sharedpreferences
+        // Create view fragment
+        mViewBy = DataHelper.VIEW_BY_ALL;
+        mPptionKeyWord = mImageTags[0];
+        showViewFragment(mViewMode, mViewBy, mPptionKeyWord); // read view mode from settings in sharedpreferences
 
         handleIntent(getIntent()); //for search
     }
 
-    private void showViewFragment(int mode) {
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        menu.findItem(R.id.action_add).setVisible(!drawerOpen);
+        menu.findItem(R.id.action_choose).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void showViewFragment(int mode, int viewBy, String optionKeyWord) {
+        Bundle args = new Bundle();
+        args.putInt(DataHelper.VIEW_BY, viewBy);
+        args.putString(DataHelper.OPTION_KEY_WORD, optionKeyWord);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
         if (mode == 0) {
             GridFragment gf = new GridFragment();
+            gf.setArguments(args);
             ft.replace(R.id.container, gf, "grid_view");
             ft.commit();
         } else if (mode == 1){
             ListFragment lf = new ListFragment();
+            lf.setArguments(args);
             ft.replace(R.id.container, lf, "list_view");
             ft.commit();
         }
+    }
+
+    /** Swaps fragments in the main content view */
+    private void selectItem(int position) {
+        // Create a new fragment and specify the planet to show based on position
+        // Insert the fragment by replacing any existing fragment
+        showViewFragment(mViewMode, DataHelper.VIEW_BY_TAG, mImageTags[position]);
+
+        // Highlight the selected item, update the title, and close the drawer
+        mDrawerList.setItemChecked(position, true);
+        setTitle(mImageTags[position]);
+        mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
     }
 
     @Override
@@ -130,7 +229,6 @@ public class MainActivity extends Activity {
     }
 
     private void handleIntent(Intent intent) {
-
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String myQueryStr = intent.getStringExtra(SearchManager.QUERY);
             System.out.println("query word = " + myQueryStr);
@@ -152,6 +250,10 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         switch (item.getItemId()) {
             case R.id.action_add:
                 showAddPopup(findViewById(item.getItemId()));
@@ -289,11 +391,11 @@ public class MainActivity extends Activity {
                 switch (item.getItemId()) {
                     case R.id.grid_view:
                         mViewMode = VIEW_MODE_GRID;
-                        showViewFragment(mViewMode);
+                        showViewFragment(mViewMode, mViewBy, mPptionKeyWord);
                         break;
                     case R.id.list_view:
                         mViewMode = VIEW_MODE_LIST;
-                        showViewFragment(mViewMode);
+                        showViewFragment(mViewMode, mViewBy, mPptionKeyWord);
                         break;
                     case R.id.multiple_select:
                         break;
@@ -302,6 +404,19 @@ public class MainActivity extends Activity {
             }
         });
         popup.show();
+    }
+
+    @Override
+    protected void onStop() { // update view mode
+        super.onStop();
+        System.out.println("MainActivity onStop.");
+        System.out.println("mViewMode = " + mViewMode);
+
+        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putInt(DataHelper.VIEW_MODE, mViewMode);
+        editor.putInt(DataHelper.VIEW_BY, mViewBy);
+        editor.putString(DataHelper.OPTION_KEY_WORD, mPptionKeyWord);
+        editor.apply();
     }
 
     // Don't have foreground activity yet
@@ -317,23 +432,21 @@ public class MainActivity extends Activity {
 //    }
 
     @Override
-    protected void onStop() { // update view mode
-        super.onStop();
-        System.out.println("MainActivity onStop.");
-        System.out.println("mViewMode = " + mViewMode);
-
-        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
-        editor.putInt(DataHelper.VIEW_MODE, mViewMode);
-        editor.apply();
-    }
-
-    @Override
     public void onResume(){
         super.onResume();
         System.out.println("MainActivity onResume.");
 
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         mViewMode = sharedPref.getInt(DataHelper.VIEW_MODE, VIEW_MODE_GRID);
-        showViewFragment(mViewMode);
+        mViewBy = sharedPref.getInt(DataHelper.VIEW_BY, DataHelper.VIEW_BY_ALL);
+        mPptionKeyWord = sharedPref.getString(DataHelper.OPTION_KEY_WORD, getResources().getStringArray(R.array.tags)[0]);
+        showViewFragment(mViewMode, mViewBy, mPptionKeyWord);
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            selectItem(position);
+        }
     }
 }

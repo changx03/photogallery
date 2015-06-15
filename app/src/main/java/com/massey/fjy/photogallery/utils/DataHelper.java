@@ -14,6 +14,9 @@ public class DataHelper {
     public static final String CURRENT_IMAGE_PATH = "currentImagePath";
     public static final String VIEW_MODE = "viewMode";
     public static final String PHOTO_GALLERY_FULL_PATH = "photoGalleryPath";
+    public static final String VIEW_BY = "viewBy";
+    public static final int VIEW_BY_ALL = 0, VIEW_BY_TAG = 1, VIEW_BY_SEARCH = 2;
+    public static final String OPTION_KEY_WORD = "optionKeyWord";
 
     public static String getDateTimeToString(){
         long msTime = System.currentTimeMillis();

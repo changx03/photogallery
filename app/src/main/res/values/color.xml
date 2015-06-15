@@ -5,4 +5,5 @@
     <color name="dark_grey">#64dfdfdf</color>
     <color name="white">#ffffff</color>
     <color name="black">#ff000000</color>
+    <color name="drawer">#32111111</color>
 </resources>

@@ -12,25 +12,47 @@
     <string name="action_next">Next</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
-    <string name="action_undo">Undo</string>
 
     <string name="photo_filter">Photo Filter</string>
     <string name="add_note">Add Note</string>
     <string name="tag_people">Tag People</string>
-    <string name="edit_tagview">Who is this?</string>
-    <string name="text_tagview">Text Tag</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_main_activity2">MainActivity2Activity</string>
     <string name="title_activity_solo_image">Photo</string>
     <string name="title_edit_image">Edit</string>
     <string name="image_description">selected image thumbnail</string>
     <string name="no_content">No content</string>
-    <string name="toast_ImageDetailActivity_delete">Deleting image...</string>
-    <string name="title_activity_image_add_tag">Add Tags</string>
+    <string name="toast_ImageDetailActivity_delete">Deleting image…</string>
     <string name="dialog_edit_editText_hint">Input new notes for this image</string>
-    <string name="toast_ImageDetailActivity_noteUpdate">Updating notes...</string>
+    <string name="toast_ImageDetailActivity_noteUpdate">Updating notes…</string>
     <string name="action_clear">Clear</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 
+    <string-array name="tags">
+        <item>All</item>
+        <item>Animals</item>
+        <item>Backgrounds</item>
+        <item>Cars</item>
+        <item>Families</item>
+        <item>Fashion</item>
+        <item>Funny</item>
+        <item>Game</item>
+        <item>Nature</item>
+        <item>Party</item>
+        <item>Sports</item>
+        <item>Travel</item>
+    </string-array>
+    <string-array name="thumbnailImages">
+        <item>thumbnail_0.jpg</item>
+        <item>thumbnail_1.jpg</item>
+        <item>thumbnail_2.jpg</item>
+        <item>thumbnail_3.jpg</item>
+        <item>thumbnail_4.jpg</item>
+        <item>thumbnail_5.jpg</item>
+        <item>thumbnail_6.jpg</item>
+        <item>thumbnail_7.jpg</item>
+        <item>thumbnail_8.jpg</item>
+        <item>thumbnail_9.jpg</item>
+    </string-array>
 </resources>
