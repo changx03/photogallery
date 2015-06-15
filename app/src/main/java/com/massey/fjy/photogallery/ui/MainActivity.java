@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -302,6 +303,8 @@ public class MainActivity extends Activity {
                 switch (item.getItemId()) {
                     case R.id.take_photo:
                         intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        //File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
+                       // intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                         startActivityForResult(intent, REQUEST_CAMERA);
                         break;
                     case R.id.choose_from_library:
@@ -357,6 +360,8 @@ public class MainActivity extends Activity {
 
     private void onCaptureImageResult(Intent data){
         Bitmap bitmap = (Bitmap)data.getExtras().get("data");
+      //  File file = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
+       // Bitmap bitmap = BitmapHelper.decodeBitmapFromUri(file.getAbsolutePath(), 1000, 700);
 
         if(!saveBitmapToPrivateGallery(bitmap)){
             System.out.println("Photo Capture: Save image failed ");
@@ -393,6 +398,8 @@ public class MainActivity extends Activity {
                 fos.close();
                 System.out.println("Image saved");
                 success = true;
+
+
 
                 // add image to database
                 DbHelper dbHelper = new DbHelper(getApplication());
