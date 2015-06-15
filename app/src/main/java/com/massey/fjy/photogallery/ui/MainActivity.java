@@ -233,17 +233,27 @@ public class MainActivity extends Activity {
             final String myQueryStr = intent.getStringExtra(SearchManager.QUERY);
             System.out.println("query word = " + myQueryStr);
             //use the query to search data somehow
-
+            mDrawerList.setVisibility(View.INVISIBLE);
             new Thread(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        Thread.sleep(1000);
+                        synchronized (this) {
+                            Thread.sleep(1000);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mDrawerList.setVisibility(View.VISIBLE);
+                                    mViewBy = DataHelper.VIEW_BY_SEARCH;
+                                    showViewFragment(mViewMode, mViewBy, myQueryStr);
+                                }
+                            });
+                        }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    //mViewBy = DataHelper.VIEW_BY_ALL;
-                    mViewBy = DataHelper.VIEW_BY_SEARCH;
-                    showViewFragment(mViewMode, mViewBy, myQueryStr);
+
+
                 }
             }).start();
         }
