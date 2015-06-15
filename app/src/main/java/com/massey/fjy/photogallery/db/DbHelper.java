@@ -91,12 +91,35 @@ public class DbHelper extends SQLiteOpenHelper{
         return imageList;
     }
 
+    public ArrayList<String> searchImagesGridView(String keyWord) {
+        ArrayList<String> imageList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        // select * from table_name where ('location'||'tag'||'note'||'tagPeople') like '%keyWord%' order by desc
+        Cursor cursor = db.rawQuery("SELECT * " +
+                "FROM " + PhotoGalleryTable.DB_TABLE_NAME +
+                " WHERE " +
+                " (" + PhotoGalleryTable.FIELD_LOCATION + " like '%" + keyWord + "%') OR" +
+                " (" + PhotoGalleryTable.FIELD_TAG + " like '%" + keyWord + "%') OR" +
+                " (" + PhotoGalleryTable.FIELD_NOTE + " like '%" + keyWord + "%') OR" +
+                " (" + PhotoGalleryTable.FIELD_TAG_PEOPLE + " like '%" + keyWord + "%')" +
+                " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " DESC", null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            imageList.add(cursor.getString(cursor.getColumnIndex(PhotoGalleryTable.FIELD_IMAGE_NAME)));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        db.close();
+
+        return imageList;
+    }
+
     public ArrayList<DataHelper.ImageData> getImagesByTag(String tag) {
         ArrayList<DataHelper.ImageData> imageList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         // selesct * from [table_name] where tag ='tag' order by date asc
         Cursor cursor = db.rawQuery("SELECT * " +
-                " FROM " + PhotoGalleryTable.DB_TABLE_NAME +
+                "FROM " + PhotoGalleryTable.DB_TABLE_NAME +
                 " WHERE " + PhotoGalleryTable.FIELD_TAG +
                 " = '" + tag + "'" +
                 " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " DESC", null);

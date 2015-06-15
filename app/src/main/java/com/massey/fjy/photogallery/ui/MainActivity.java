@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
                     // add to database
                     //save(tag,location,latitude,longitude, note, imageName, date, tagPeople)
                     Long save = dbHelper.save(getResources().getStringArray(R.array.tags)[i],
-                            "Cat city",
+                            "Auckland",
                             (float) 999.999,
                             (float) 666.666,
                             ("Note: " + getResources().getStringArray(R.array.thumbnailImages)[i]),
@@ -230,11 +230,25 @@ public class MainActivity extends Activity {
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String myQueryStr = intent.getStringExtra(SearchManager.QUERY);
+            final String myQueryStr = intent.getStringExtra(SearchManager.QUERY);
             System.out.println("query word = " + myQueryStr);
             //use the query to search data somehow
+
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    //mViewBy = DataHelper.VIEW_BY_ALL;
+                    mViewBy = DataHelper.VIEW_BY_SEARCH;
+                    showViewFragment(mViewMode, mViewBy, myQueryStr);
+                }
+            }).start();
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

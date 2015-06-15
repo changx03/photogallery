@@ -55,6 +55,7 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
         Bundle bundle = this.getArguments();
         mViewBy = bundle.getInt(DataHelper.VIEW_BY, 0);
         optionKeyWord = bundle.getString(DataHelper.OPTION_KEY_WORD, getResources().getStringArray(R.array.tags)[0]);
+        System.out.println("mViewBy = " + mViewBy + " optionKeyWord = " + optionKeyWord);
     }
 
     @Override
@@ -78,6 +79,8 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
             } else {
                 myImageList = dbHelper.getImagesByTagGridView(optionKeyWord);
             }
+        } else {
+            myImageList = dbHelper.searchImagesGridView(optionKeyWord);
         }
 
         SystemClock.sleep(100);
