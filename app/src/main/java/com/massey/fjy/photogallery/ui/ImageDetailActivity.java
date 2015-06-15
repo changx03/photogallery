@@ -256,12 +256,19 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            String[] tags = getResources().getStringArray(R.array.tags);
+            tags[0] = "None";
             builder.setTitle(R.string.edit_tag_title)
-                    .setItems(R.array.tags, new DialogInterface.OnClickListener() {
+                    .setItems(tags, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // The 'which' argument contains the index position
                             // of the selected item
-                            String updatedTag = getResources().getStringArray(R.array.tags)[which];
+                            String updatedTag;
+                            if (which == 0) {
+                                updatedTag = "";
+                            } else {
+                                updatedTag = getResources().getStringArray(R.array.tags)[which];
+                            }
                             System.out.println("LOG ImageDetailActivity: new tag = " + updatedTag);
                             DbHelper dbHelper = new DbHelper(getActivity());
                             DataHelper.ImageData imageData = dbHelper.getImageDataByImageName(myImageName);
