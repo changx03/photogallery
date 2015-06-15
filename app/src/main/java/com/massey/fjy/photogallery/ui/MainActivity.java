@@ -63,13 +63,13 @@ public class MainActivity extends Activity {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private int mViewBy;
-    private String mPptionKeyWord;
+    private String mOptionKeyWord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        System.out.println("LOG MainActivity onCreate");
         // provide some initial testing images
         DbHelper dbHelper = new DbHelper(this);
         String photoGalleryPath = getFilesDir() + "/" + DataHelper.IMAGE_DIR;
@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
                     // add to database
                     //save(tag,location,latitude,longitude, note, imageName, date, tagPeople)
                     Long save = dbHelper.save(getResources().getStringArray(R.array.tags)[i],
-                            "Cat city",
+                            "Auckland",
                             (float) 999.999,
                             (float) 666.666,
                             ("Note: " + getResources().getStringArray(R.array.thumbnailImages)[i]),
@@ -116,9 +116,9 @@ public class MainActivity extends Activity {
         mTitle = mDrawerTitle = getTitle();
         mImageTags = getResources().getStringArray(R.array.tags);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        System.out.println("LOG MainActivity mDrawerLayout = " + mDrawerLayout);
+        //System.out.println("LOG MainActivity mDrawerLayout = " + mDrawerLayout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        System.out.println("LOG MainActivity mDrawerList = " + mDrawerList);
+        //System.out.println("LOG MainActivity mDrawerList = " + mDrawerList);
         mDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, mImageTags));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
@@ -157,8 +157,8 @@ public class MainActivity extends Activity {
         mViewMode = settings.getInt(DataHelper.VIEW_MODE, VIEW_MODE_GRID);   // use fragment_grid view as default
         // Create view fragment
         mViewBy = DataHelper.VIEW_BY_ALL;
-        mPptionKeyWord = mImageTags[0];
-        showViewFragment(mViewMode, mViewBy, mPptionKeyWord); // read view mode from settings in sharedpreferences
+        mOptionKeyWord = mImageTags[0];
+        showViewFragment(mViewMode, mViewBy, mOptionKeyWord); // read view mode from settings in sharedpreferences
 
         handleIntent(getIntent()); //for search
     }
@@ -230,11 +230,25 @@ public class MainActivity extends Activity {
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String myQueryStr = intent.getStringExtra(SearchManager.QUERY);
+            final String myQueryStr = intent.getStringExtra(SearchManager.QUERY);
             System.out.println("query word = " + myQueryStr);
             //use the query to search data somehow
+
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    //mViewBy = DataHelper.VIEW_BY_ALL;
+                    mViewBy = DataHelper.VIEW_BY_SEARCH;
+                    showViewFragment(mViewMode, mViewBy, myQueryStr);
+                }
+            }).start();
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -297,6 +311,9 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // reset tag option
+        mOptionKeyWord = mImageTags[0];
+
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_FILE) {
                 onSelectFromGalleryResult(data);
@@ -305,6 +322,7 @@ public class MainActivity extends Activity {
                 onCaptureImageResult(data);
             }
         }
+        showViewFragment(mViewMode, mViewBy, mOptionKeyWord);
     }
 
     private void onSelectFromGalleryResult(Intent data){
@@ -391,11 +409,11 @@ public class MainActivity extends Activity {
                 switch (item.getItemId()) {
                     case R.id.grid_view:
                         mViewMode = VIEW_MODE_GRID;
-                        showViewFragment(mViewMode, mViewBy, mPptionKeyWord);
+                        showViewFragment(mViewMode, mViewBy, mOptionKeyWord);
                         break;
                     case R.id.list_view:
                         mViewMode = VIEW_MODE_LIST;
-                        showViewFragment(mViewMode, mViewBy, mPptionKeyWord);
+                        showViewFragment(mViewMode, mViewBy, mOptionKeyWord);
                         break;
                     case R.id.multiple_select:
                         break;
@@ -408,39 +426,45 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onStop() { // update view mode
-        super.onStop();
-        System.out.println("MainActivity onStop.");
-        System.out.println("mViewMode = " + mViewMode);
+        System.out.println("LOG MainActivity onStop");
+        System.out.println("mViewMode = " + mViewMode + " mViewBy = " + mViewBy + " mOptionKeyWord = " + mOptionKeyWord);
 
         SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
         editor.putInt(DataHelper.VIEW_MODE, mViewMode);
         editor.putInt(DataHelper.VIEW_BY, mViewBy);
-        editor.putString(DataHelper.OPTION_KEY_WORD, mPptionKeyWord);
+        editor.putString(DataHelper.OPTION_KEY_WORD, mOptionKeyWord);
         editor.apply();
+
+        super.onStop();
     }
 
     // Don't have foreground activity yet
 //    @Override
 //    public void onPause(){
-//        super.onPause();
-//        System.out.println("MainActivity onPause.");
-//        System.out.println("mViewMode = " + mViewMode);
+//        System.out.println("LOG MainActivity onPause");
+//        System.out.println("mViewMode = " + mViewMode + " mViewBy = " + mViewBy + " mOptionKeyWord = " + mOptionKeyWord);
 //
-//        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit();
-//        editor.putInt(VIEW_MODE, mViewMode);
+//        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
+//        editor.putInt(DataHelper.VIEW_MODE, mViewMode);
+//        editor.putInt(DataHelper.VIEW_BY, mViewBy);
+//        editor.putString(DataHelper.OPTION_KEY_WORD, mOptionKeyWord);
 //        editor.apply();
+//
+//        super.onPause();
 //    }
 
     @Override
     public void onResume(){
-        super.onResume();
-        System.out.println("MainActivity onResume.");
+        System.out.println("LOG MainActivity onResume");
 
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         mViewMode = sharedPref.getInt(DataHelper.VIEW_MODE, VIEW_MODE_GRID);
         mViewBy = sharedPref.getInt(DataHelper.VIEW_BY, DataHelper.VIEW_BY_ALL);
-        mPptionKeyWord = sharedPref.getString(DataHelper.OPTION_KEY_WORD, getResources().getStringArray(R.array.tags)[0]);
-        showViewFragment(mViewMode, mViewBy, mPptionKeyWord);
+        mOptionKeyWord = sharedPref.getString(DataHelper.OPTION_KEY_WORD, getResources().getStringArray(R.array.tags)[0]);
+        System.out.println("mViewMode = " + mViewMode + " mViewBy = " + mViewBy + " mOptionKeyWord = " + mOptionKeyWord);
+
+        //showViewFragment(mViewMode, mViewBy, mOptionKeyWord);
+        super.onResume();
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

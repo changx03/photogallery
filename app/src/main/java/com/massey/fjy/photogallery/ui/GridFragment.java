@@ -46,6 +46,7 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Context context = getActivity();
+        System.out.println("LOG GridFragment onCreate");
 
         dbHelper = new DbHelper(context);
         myAsyncTaskLoader = new AsyncTaskLoadFiles(myImgAdapter);
@@ -54,6 +55,7 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
         Bundle bundle = this.getArguments();
         mViewBy = bundle.getInt(DataHelper.VIEW_BY, 0);
         optionKeyWord = bundle.getString(DataHelper.OPTION_KEY_WORD, getResources().getStringArray(R.array.tags)[0]);
+        System.out.println("mViewBy = " + mViewBy + " optionKeyWord = " + optionKeyWord);
     }
 
     @Override
@@ -61,8 +63,7 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_grid, container, false);
-
-        System.out.println("onCreateView");
+        System.out.println("LOG GridFragment onCreateView");
 
         mGridView = (GridView)view.findViewById(R.id.myGrid);
         mGridView.setOnScrollListener(this);
@@ -78,6 +79,8 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
             } else {
                 myImageList = dbHelper.getImagesByTagGridView(optionKeyWord);
             }
+        } else {
+            myImageList = dbHelper.searchImagesGridView(optionKeyWord);
         }
 
         SystemClock.sleep(100);
@@ -105,7 +108,7 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
     @Override
     public  void onPause(){
         super.onPause();
-        System.out.println("GridFragment onPause");
+        System.out.println("LOG GridFragment onPause");
         myAsyncTaskLoader.cancel(true);
         myImgAdapter = null;
         int counts = mGridView.getCount();
@@ -234,7 +237,7 @@ public class GridFragment extends Fragment implements AbsListView.OnScrollListen
                 protected Bitmap doInBackground(ViewHolder... params) {
                     viewHolder = params[0];
                     int reqSize = BitmapHelper.getPixelValueFromDps(mContext, BitmapHelper.IMAGE_THUMBNAIL_SIZE);
-                    System.out.println("reqSize = " + reqSize);
+//                    System.out.println("reqSize = " + reqSize);
                     return BitmapHelper.decodeBitmapFromUri(itemList.get(position), reqSize, reqSize);
                 }
 

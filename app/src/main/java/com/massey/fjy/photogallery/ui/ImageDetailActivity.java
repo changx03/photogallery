@@ -343,9 +343,10 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
 
     @Override
     protected void onStop() { // update view mode
-        super.onStop();
         System.out.println("LOG ImageDetailActivity: onStop.");
-        mySelectedBitmap.recycle();
+        if (mySelectedBitmap != null) {
+            mySelectedBitmap.recycle();
+        }
         ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setImageDrawable(null);
 
@@ -353,11 +354,11 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         editor.putString(DataHelper.CURRENT_IMAGE_PATH, imagePath);
 
         editor.apply();
+        super.onStop();
     }
 
     @Override
     protected void onResume(){
-        super.onResume();
         System.out.println("LOG ImageDetailActivity: onResume.");
 
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
@@ -371,6 +372,8 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
         imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         imageView.setImageBitmap(mySelectedBitmap);
+
+        super.onResume();
     }
 
     public static class EditTagDialog extends DialogFragment {
@@ -386,12 +389,19 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            String[] tags = getResources().getStringArray(R.array.tags);
+            tags[0] = "None";
             builder.setTitle(R.string.edit_tag_title)
-                    .setItems(R.array.tags, new DialogInterface.OnClickListener() {
+                    .setItems(tags, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // The 'which' argument contains the index position
                             // of the selected item
-                            String updatedTag = getResources().getStringArray(R.array.tags)[which];
+                            String updatedTag;
+                            if (which == 0) {
+                                updatedTag = "";
+                            } else {
+                                updatedTag = getResources().getStringArray(R.array.tags)[which];
+                            }
                             System.out.println("LOG ImageDetailActivity: new tag = " + updatedTag);
                             DbHelper dbHelper = new DbHelper(getActivity());
                             DataHelper.ImageData imageData = dbHelper.getImageDataByImageName(myImageName);
