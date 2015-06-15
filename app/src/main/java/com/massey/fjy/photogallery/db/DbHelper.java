@@ -72,11 +72,28 @@ public class DbHelper extends SQLiteOpenHelper{
         return imageList;
     }
 
+    public ArrayList<DataHelper.ImageData> getAllListView(){
+        ArrayList<DataHelper.ImageData> imageList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT *" +
+                " FROM " + PhotoGalleryTable.DB_TABLE_NAME +
+                " ORDER BY " + PhotoGalleryTable.FIELD_DATE + " DESC", null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()){
+            DataHelper.ImageData imageData = getImageDataByCursor(cursor);
+            imageList.add(imageData);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        db.close();
+        return imageList;
+    }
+
     public ArrayList<String> getImagesByTagGridView(String tag) {
         ArrayList<String> imageList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         // selesct * from [table_name] where tag ='tag' order by date asc
-        Cursor cursor = db.rawQuery("SELECT * " +
+        Cursor cursor = db.rawQuery("SELECT *" +
                 " FROM " + PhotoGalleryTable.DB_TABLE_NAME +
                 " WHERE " + PhotoGalleryTable.FIELD_TAG +
                 " = '" + tag + "'" +

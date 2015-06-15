@@ -209,17 +209,21 @@ public class MainActivity extends Activity {
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
-        if (mode == 0) {
-            GridFragment gf = new GridFragment();
+//        if (mode == 0) {
+//            GridFragment gf = new GridFragment();
+//            gf.setArguments(args);
+//            ft.replace(R.id.container, gf, "grid_view");
+//            ft.commit();
+//        } else if (mode == 1){
+//            ListFragment lf = new ListFragment();
+//            lf.setArguments(args);
+//            ft.replace(R.id.container, lf, "list_view");
+//            ft.commit();
+//        }
+        GridFragment gf = new GridFragment();
             gf.setArguments(args);
             ft.replace(R.id.container, gf, "grid_view");
             ft.commit();
-        } else if (mode == 1){
-            ListFragment lf = new ListFragment();
-            lf.setArguments(args);
-            ft.replace(R.id.container, lf, "list_view");
-            ft.commit();
-        }
     }
 
     /** Swaps fragments in the main content view */
