@@ -17,7 +17,7 @@
     <string name="photo_filter">Photo Filter</string>
     <string name="add_note">Add Note</string>
     <string name="tag_people">Tag People</string>
-    <string name="edit_tagview">Who is this?</string>
+    <string name="edit_tagview">Edit</string>
     <string name="text_tagview">Text Tag</string>
 
     <string name="title_activity_main_activity2">MainActivity2Activity</string>

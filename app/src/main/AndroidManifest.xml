@@ -33,11 +33,13 @@
         </activity>
         <activity
             android:name=".ui.ImageEditActivity"
-            android:label="@string/title_edit_image" >
+            android:label="@string/title_edit_image"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ui.ImageAddTagActivity"
-            android:label="@string/title_activity_image_add_tag" >
+            android:label="@string/title_activity_image_add_tag"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

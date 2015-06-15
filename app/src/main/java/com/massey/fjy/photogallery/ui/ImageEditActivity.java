@@ -1,8 +1,10 @@
 package com.massey.fjy.photogallery.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -251,13 +253,32 @@ public class ImageEditActivity extends Activity {
 
     }
 
+    private void showSaveAlertDialog() {
+        //create a alert dialog before Save
+        AlertDialog.Builder builder = new AlertDialog.Builder(ImageEditActivity.this);
+        builder.setMessage("Save Filter?");
+        builder.setPositiveButton(R.string.action_save, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new SaveImageToFileTask().execute();
+            }
+        });
+        builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                new SaveImageToFileTask().execute();
+                showSaveAlertDialog();
                 return true;
-
         }
 
         return super.onOptionsItemSelected(item);

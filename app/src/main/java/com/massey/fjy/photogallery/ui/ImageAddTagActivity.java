@@ -1,8 +1,10 @@
 package com.massey.fjy.photogallery.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -27,10 +29,13 @@ import com.massey.fjy.photogallery.utils.DataHelper;
 import com.massey.fjy.photogallery.utils.TagImageLayout;
 import com.massey.fjy.photogallery.utils.TagLayout;
 
+import org.w3c.dom.Text;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ImageAddTagActivity extends Activity {
     String imagePath;
@@ -62,6 +67,8 @@ public class ImageAddTagActivity extends Activity {
         tagImageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
       //  tagImageView.setBackground(new BitmapDrawable(getResources(), resourceImage));
         tagImageView.setImageBitmap(resourceImage);
+
+        getActionBar().setIcon(android.R.color.transparent);
     }
 
     private class SaveTagImageToFileTask extends AsyncTask<Void, Void, Void> {
@@ -100,19 +107,39 @@ public class ImageAddTagActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
-            saveAndClearTags();
-            SaveTagImageToFileTask s = new SaveTagImageToFileTask();
-            s.execute();
+            showSaveAlertDialog();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void showSaveAlertDialog() {
+        //create a alert dialog before Save
+        AlertDialog.Builder builder = new AlertDialog.Builder(ImageAddTagActivity.this);
+        builder.setMessage("Save Tags?");
+        builder.setPositiveButton(R.string.action_save, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveAndClearTags();
+                SaveTagImageToFileTask s = new SaveTagImageToFileTask();
+                s.execute();
+            }
+        });
+        builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+
+    }
+
     private void saveAndClearTags() {
         TagImageLayout tagImage = (TagImageLayout)findViewById(R.id.tag_image_layout);
-        ArrayList<String> tagsContent = getTagsContent(tagImage); // Get All content
-        System.out.println("LOG: tags content" + tagsContent);
+        String tagsContentResult = getTagsContent(tagImage); // Get All content
+        System.out.println("LOG: tags content" + tagsContentResult);
     }
 
     @Override
@@ -148,22 +175,42 @@ public class ImageAddTagActivity extends Activity {
         }
     }
 
-    private ArrayList<String> getTagsContent(TagImageLayout tagImage) {
+    private List<EditText> getAllTextViews(View v) {
+        if (v instanceof EditText) { // It's a leaf
+            List<EditText> r = new ArrayList<EditText>();
+            r.add((EditText)v);
+            return r;
+        } else {
+            List<EditText> list = new ArrayList<EditText>();
+            if (v instanceof ViewGroup) {
+                // If it's an internal node find children
+                int childNum = ((ViewGroup) v).getChildCount();
+                for (int i = 0; i < childNum; i++) {
+                    list.addAll(getAllTextViews(((ViewGroup) v).getChildAt(i)));
+                }
+            }
+            return list;
+        }
+    }
+
+    private String getTagsContent(TagImageLayout tagImage) {
+        String res = "";
         ArrayList<String> tagsContent = new ArrayList<>();
-        int childNum = tagImage.getChildCount();
-        for (int i = 1; i < childNum; i++) {
-            TagLayout tl = (TagLayout)tagImage.getChildAt(i);
-            ViewGroup vg = (ViewGroup)tl.getChildAt(0);
-            RelativeLayout rl = (RelativeLayout)vg.getChildAt(0);
-            TextView tv = (TextView)rl.getChildAt(0);
-            EditText ev = (EditText)rl.getChildAt(1);
-            ev.setEnabled(false);
-            if (tv.getText().length() != 0) {
-                tagsContent.add(tv.getText().toString());
+        List<EditText> ets = getAllTextViews(tagImage);
+        for (int i = 0; i < ets.size(); i++) {
+            EditText et = ets.get(i);
+            et.setEnabled(false);
+            if (et.getText().length() != 0) tagsContent.add(et.getText().toString());
+            else {
+                RelativeLayout tl = (RelativeLayout)(et.getParent());
+                tl.setVisibility(View.GONE);
             }
         }
-        System.out.println("LOG tags content = " + tagsContent);
-        return tagsContent;
+        for (int i = 0; i < tagsContent.size(); i++) {
+            if (i > 0) res = res.concat(":");
+            res = res.concat(tagsContent.get(i).replace(":", " "));
+        }
+        return res;
     }
 
     private void ShowProgressDialog() {
