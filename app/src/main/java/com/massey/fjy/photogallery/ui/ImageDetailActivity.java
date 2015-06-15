@@ -55,11 +55,25 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         SystemClock.sleep(100);
 
         // get image name from database
-        DbHelper dbHelper = new DbHelper(this);
-        ArrayList<String> imagesNames = dbHelper.getAllGridView();
-        myImageName = imagesNames.get(currentIndex);
         SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
         String photoGalleryPath = sharedPref.getString(DataHelper.PHOTO_GALLERY_FULL_PATH, null);
+        int mViewBy = sharedPref.getInt(DataHelper.VIEW_BY, DataHelper.VIEW_BY_ALL);
+        String optionKeyWord = sharedPref.getString(DataHelper.OPTION_KEY_WORD,
+                getResources().getStringArray(R.array.tags)[0]);
+        ArrayList<String> myImageList = new ArrayList<>();
+        DbHelper dbHelper = new DbHelper(this);
+        // get image list by options
+        if (mViewBy == DataHelper.VIEW_BY_ALL) {
+            myImageList = dbHelper.getAllGridView();
+        } else if (mViewBy == DataHelper.VIEW_BY_TAG) {
+            if (optionKeyWord.equals(getResources().getStringArray(R.array.tags)[0])) {
+                myImageList = dbHelper.getAllGridView();
+            } else {
+                myImageList = dbHelper.getImagesByTagGridView(optionKeyWord);
+            }
+        }
+        myImageName = myImageList.get(currentIndex);
+
         imagePath = photoGalleryPath + "/" + myImageName;
         System.out.println("LOG ImageDetailActivity: imagePath = " + imagePath);
 
@@ -201,6 +215,38 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
         myNote.setText(imageData.note);
     }
 
+    @Override
+    protected void onStop() { // update view mode
+        super.onStop();
+        System.out.println("LOG ImageDetailActivity: onStop.");
+        mySelectedBitmap.recycle();
+        ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
+        imageView.setImageDrawable(null);
+
+        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString(DataHelper.CURRENT_IMAGE_PATH, imagePath);
+
+        editor.apply();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        System.out.println("LOG ImageDetailActivity: onResume.");
+
+        SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
+        imagePath = sharedPref.getString(DataHelper.CURRENT_IMAGE_PATH, null);
+
+        // scale down the image
+        int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(),
+                BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
+        mySelectedBitmap = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
+
+        ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
+        imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        imageView.setImageBitmap(mySelectedBitmap);
+    }
+
     private class EditNoteDialog extends Dialog {
         private Context myContext;
         private DbHelper dbHelper;
@@ -253,37 +299,5 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
             });
             super.setContentView(mContentView);
         }
-    }
-
-    @Override
-    protected void onStop() { // update view mode
-        super.onStop();
-        System.out.println("LOG ImageDetailActivity: onStop.");
-        mySelectedBitmap.recycle();
-        ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
-        imageView.setImageDrawable(null);
-
-        SharedPreferences.Editor editor = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE).edit();
-        editor.putString(DataHelper.CURRENT_IMAGE_PATH, imagePath);
-
-        editor.apply();
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        System.out.println("LOG ImageDetailActivity: onResume.");
-
-        SharedPreferences sharedPref = getSharedPreferences(DataHelper.PREFS_NAME, Context.MODE_PRIVATE);
-        imagePath = sharedPref.getString(DataHelper.CURRENT_IMAGE_PATH, null);
-
-        // scale down the image
-        int reqSize = BitmapHelper.getPixelValueFromDps(getApplicationContext(),
-                BitmapHelper.IMAGE_DETAIL_ACTIVITY_WINDOW_HEIGHT);
-        mySelectedBitmap = BitmapHelper.decodeBitmapFromUri(imagePath, reqSize, reqSize);
-
-        ImageView imageView = (ImageView) findViewById(R.id.imageDetail_image);
-        imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        imageView.setImageBitmap(mySelectedBitmap);
     }
 }
