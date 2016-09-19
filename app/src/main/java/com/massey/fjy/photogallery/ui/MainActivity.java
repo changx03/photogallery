@@ -522,7 +522,7 @@ public class MainActivity extends Activity {
         mOptionKeyWord = sharedPref.getString(DataHelper.OPTION_KEY_WORD, getResources().getStringArray(R.array.tags)[0]);
         System.out.println("mViewMode = " + mViewMode + " mViewBy = " + mViewBy + " mOptionKeyWord = " + mOptionKeyWord);
 
-        //showViewFragment(mViewMode, mViewBy, mOptionKeyWord);
+        showViewFragment(mViewMode, mViewBy, mOptionKeyWord);
         super.onResume();
     }
 

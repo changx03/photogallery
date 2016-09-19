@@ -129,6 +129,14 @@ public class ImageDetailActivity extends FragmentActivity implements DialogInter
             item = menu.findItem(R.id.action_share);
             item.setEnabled(false);
             item.getIcon().setAlpha(50);
+            System.out.println("LOG is landscape");
+        } else {
+            MenuItem item = menu.findItem(R.id.action_export);
+            item.setEnabled(true);
+            item.getIcon().setAlpha(255);
+            item = menu.findItem(R.id.action_share);
+            item.setEnabled(true);
+            item.getIcon().setAlpha(255);
         }
         return true;
     }
